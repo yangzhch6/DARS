@@ -71,11 +71,13 @@ class RewardManager():
             # decode
             sequences = torch.cat((valid_prompt_ids, valid_response_ids))
             sequences_str = self.tokenizer.decode(sequences)
+            sequences_str = "\nassistant\n".join(sequences_str.split("\nassistant\n")[1:])
+
             # if not "no_think" in self.reward_impl_version:
-            from deepscaler.globals import THOUGHT_DELIMITER_START
+            # from deepscaler.globals import THOUGHT_DELIMITER_START
             # sequences_str = [THOUGHT_DELIMITER_START + seq.strip() for seq in sequences_str]
-            if self.reward_impl_version != 2: # if think
-                sequences_str = THOUGHT_DELIMITER_START + '\n' + sequences_str
+            # if self.reward_impl_version != 2: # if think
+            #     sequences_str = THOUGHT_DELIMITER_START + '\n' + sequences_str
 
             ground_truth = data_item.non_tensor_batch['reward_model']['ground_truth']
 

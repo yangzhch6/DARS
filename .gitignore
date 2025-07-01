@@ -185,3 +185,5 @@ tmp/
 
 # Ignore debug logs and run result logs
 logs/
+
+slurm
