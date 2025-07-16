@@ -27,6 +27,7 @@ from pprint import pprint
 from typing import Type, Dict
 
 import numpy as np
+from tqdm import tqdm
 from codetiming import Timer
 from omegaconf import OmegaConf, open_dict
 from verl import DataProto
@@ -369,7 +370,7 @@ class RayPPOTrainer(object):
             train_batch_size = int(train_batch_size)
         self.train_dataloader = DataLoader(dataset=self.train_dataset,
                                            batch_size=train_batch_size,
-                                           shuffle=True,
+                                           shuffle=self.config.data.get('shuffle', True),
                                            drop_last=True,
                                            collate_fn=collate_fn)
 
@@ -381,8 +382,8 @@ class RayPPOTrainer(object):
                                        return_raw_chat=self.config.data.get('return_raw_chat', False),
                                        truncation='error')
         self.val_dataloader = DataLoader(dataset=self.val_dataset,
-                                         batch_size=len(self.val_dataset),
-                                         shuffle=False,
+                                         batch_size=self.config.data.val_batch_size,
+                                         shuffle=self.config.data.get('shuffle', True),
                                          drop_last=False,
                                          collate_fn=collate_fn)
 
@@ -461,7 +462,7 @@ class RayPPOTrainer(object):
 
         ground_truth_answers = []
 
-        for test_data in self.val_dataloader:
+        for test_data in tqdm(self.val_dataloader):
             gt_answer = test_data['reward_model']
             gt_answer = [item['ground_truth'] for item in gt_answer]
             gt_answer = [item for item in gt_answer for _ in range(self.config.actor_rollout_ref.rollout.n_val)]
@@ -786,6 +787,7 @@ class RayPPOTrainer(object):
                 with _timer('step', timing_raw):
                     # generate a batch
                     with _timer('gen', timing_raw):
+                        print("## generating")
                         batch = self.actor_rollout_wg.generate_sequences(batch)
 
                     # compute values

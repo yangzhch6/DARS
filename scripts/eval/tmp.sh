@@ -1,0 +1,2 @@
+bash /hpc2hdd/home/zyang398/yangzhch6/projs/reasoning_baselines/rllm/scripts/eval/Qwen2.5-Math-7B-deepscaler-cot-nothink-n40.sh
+bash /hpc2hdd/home/zyang398/yangzhch6/projs/reasoning_baselines/rllm/scripts/eval/Qwen2.5-Math-7B-deepscaler-cot-step500-deepscaler-cot-nothink-n40.sh
