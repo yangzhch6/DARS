@@ -677,6 +677,13 @@ class RayPPOTrainer(object):
         torch.cuda.empty_cache()
         # sleep(30)
 
+        ## delete last checkpoint actor
+        last_ckpt_path = os.path.join(self.config.trainer.default_local_dir,
+                                                f'global_step_{self.global_steps - self.config.trainer.save_freq}', 'actor')
+        import shutil
+        if os.path.exists(last_ckpt_path) and os.path.isdir(last_ckpt_path):
+            shutil.rmtree(last_ckpt_path)
+
     def _load_checkpoint(self):
         # load from hdfs
         if self.config.trainer.default_hdfs_dir is not None:
