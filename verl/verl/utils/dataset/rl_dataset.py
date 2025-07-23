@@ -64,6 +64,7 @@ class RLHFDataset(Dataset):
                  parquet_files: Union[str, List[str]],
                  tokenizer: PreTrainedTokenizer,
                  prompt_key='prompt',
+                 use_template=True,
                  max_prompt_length=1024,
                  filter_prompts=True,
                  cache_dir='~/.cache/verl/rlhf',
@@ -84,6 +85,7 @@ class RLHFDataset(Dataset):
         self.return_raw_chat = return_raw_chat
         self.chat_template_func = chat_template_func
         self.truncation = truncation
+        self.use_template = use_template
 
         self._download()
         self._read_files_and_tokenize()
@@ -141,11 +143,14 @@ class RLHFDataset(Dataset):
         """
         row_dict = self.dataframe.iloc[item].to_dict()
 
-        chat = row_dict.pop(self.prompt_key)
+        item_prompt = row_dict.pop(self.prompt_key)
 
-        prompt_with_chat_template = self.tokenizer.apply_chat_template(chat, add_generation_prompt=True, tokenize=False)
-
-        input_ids, attention_mask = verl_F.tokenize_and_postprocess_data(prompt=prompt_with_chat_template,
+        if self.use_template:
+            text_prompt = self.tokenizer.apply_chat_template(item_prompt, add_generation_prompt=True, tokenize=False)
+        else:
+            text_prompt = item_prompt
+        
+        input_ids, attention_mask = verl_F.tokenize_and_postprocess_data(prompt=text_prompt,
                                                                          tokenizer=self.tokenizer,
                                                                          max_length=self.max_prompt_length,
                                                                          pad_token_id=self.tokenizer.pad_token_id,
