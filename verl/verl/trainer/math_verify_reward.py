@@ -32,6 +32,10 @@ class RewardMathFn(RewardFn):
         problem = input.problem
         model_response = input.model_response
         
+        if not self.config.use_code: # not allowed code usage
+            if "```python" in model_response.lower() or "'''python" in model_response.lower():
+                return RewardOutput(reward=self.config.incorrect_reward, is_correct=False)
+
         # print("think_format", self.config.think_format)
         if self.config.think_format:
             # Extract solution.
@@ -51,6 +55,8 @@ class RewardMathFn(RewardFn):
 
 def reward_fn_math_verify(solution_str: str, ground_truth: Union[str, List[str]], enable_llm = False):
     reward_config = RewardConfig()
+    reward_config.think_format = True
+    reward_config.use_code = True
     reward_config.use_math_orm = enable_llm
     reward_fn = RewardMathFn(reward_config)
     reward_response = reward_fn(RewardInput(problem=solution_str, problem_type=RewardType.MATH, model_response=solution_str, ground_truth={"answer": ground_truth}))
@@ -59,6 +65,16 @@ def reward_fn_math_verify(solution_str: str, ground_truth: Union[str, List[str]]
 def reward_fn_math_verify_no_think(solution_str: str, ground_truth: Union[str, List[str]], enable_llm = False):
     reward_config = RewardConfig()
     reward_config.think_format = False
+    reward_config.use_code = True
+    reward_config.use_math_orm = enable_llm
+    reward_fn = RewardMathFn(reward_config)
+    reward_response = reward_fn(RewardInput(problem=solution_str, problem_type=RewardType.MATH, model_response=solution_str, ground_truth={"answer": ground_truth}))
+    return reward_response.is_correct
+
+def reward_fn_math_verify_no_think_no_code(solution_str: str, ground_truth: Union[str, List[str]], enable_llm = False):
+    reward_config = RewardConfig()
+    reward_config.think_format = False
+    reward_config.use_code = False
     reward_config.use_math_orm = enable_llm
     reward_fn = RewardMathFn(reward_config)
     reward_response = reward_fn(RewardInput(problem=solution_str, problem_type=RewardType.MATH, model_response=solution_str, ground_truth={"answer": ground_truth}))

@@ -19,13 +19,15 @@ from verl import DataProto
 import torch
 from verl.utils.reward_score import gsm8k, math
 from verl.trainer.ppo.ray_trainer import RayPPOTrainer
-from verl.trainer.math_verify_reward import reward_fn_math_verify, reward_fn_math_verify_no_think
+from verl.trainer.math_verify_reward import reward_fn_math_verify, reward_fn_math_verify_no_think, reward_fn_math_verify_no_think_no_code
 
 def _select_rm_score_fn(data_source, reward_impl_version):
     if reward_impl_version == 1: # think
         return reward_fn_math_verify
     elif reward_impl_version == 2: # no_think
         return reward_fn_math_verify_no_think
+    elif reward_impl_version == 3: # no_think no_code
+        return reward_fn_math_verify_no_think_no_code
     else:
         raise NotImplementedError
 

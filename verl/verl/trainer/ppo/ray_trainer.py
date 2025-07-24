@@ -410,6 +410,72 @@ class RayPPOTrainer(object):
             self.config.critic.optim.total_training_steps = total_training_steps
 
 
+    def log_train_generations(self, batch):
+        # print(batch)
+        input_ids = batch.batch['input_ids'][:, :self.config.data.max_prompt_length]
+        input_texts = [self.tokenizer.decode(ids, skip_special_tokens=True) for ids in input_ids]
+        output_texts = [self.tokenizer.decode(ids, skip_special_tokens=True) for ids in batch.batch['responses']]
+        sample_scores = batch.batch['token_level_scores'].sum(-1).cpu().tolist()
+        response_info = _compute_response_info(batch)
+        response_lengths = torch.tensor(response_info['response_length']).cpu()
+        data_sources = batch.non_tensor_batch.get('data_source', ['unknown'] * batch.batch['responses'].shape[0])
+        gt_answer = batch.non_tensor_batch['reward_model']
+        gt_answer = [item['ground_truth'] for item in gt_answer]
+        # print(input_texts)
+
+        json_folder = os.path.join(self.config.trainer.default_local_dir, "train_generations")
+        save_data = []
+        for line_input, line_output, line_score, line_response_length, line_data_source, gt_answer in zip(input_texts, output_texts, sample_scores, response_lengths, data_sources, gt_answer):
+            save_data.append({
+                'input': line_input,
+                'output': line_output,
+                'answer': gt_answer,
+                'score': line_score,
+                'response_length': line_response_length.item(),
+                'data_source': line_data_source,
+            })
+
+        uids = batch.non_tensor_batch['uid']
+        # print(len(save_data))
+        # print(uids)
+
+        aggragated_data_dict = {} ## aggragat according to uid
+        for uid, line in zip(uids, save_data):
+            uid_key = str(uid)
+            if uid_key not in aggragated_data_dict:
+                aggragated_data_dict[uid_key] = [line]
+            else:
+                aggragated_data_dict[uid_key].append(line)
+        
+        aggragated_data = []
+        for uid in aggragated_data_dict:
+            aggragated_line = aggragated_data_dict[uid]
+            assert len(aggragated_line) % self.config.actor_rollout_ref.rollout.n == 0, "Length: {}".format(len(aggragated_line))
+            line_input = aggragated_line[0]['input']
+            line_inputs = [sample['input'] for sample in aggragated_line]
+            assert len(set(line_inputs)) == 1, "Questions should be the same for each sample in a batch"
+            line_outputs = [sample['output'] for sample in aggragated_line]
+            line_answers = [sample['answer'] for sample in aggragated_line]
+            assert len(set(line_answers)) == 1, "Answers should be the same for each sample in a batch"
+            line_scores = [sample['score'] for sample in aggragated_line]
+            line_response_lengths = [sample['response_length'] for sample in aggragated_line]
+            line_data_source = [sample['data_source'] for sample in aggragated_line]
+            assert len(set(line_data_source)) == 1, "Data source should be the same for each sample in a batch"
+            aggragated_data.append({
+                'input': line_input,
+                'output': line_outputs,
+                'answer': line_answers[0],
+                'score': line_scores,
+                'response_length': line_response_lengths,
+                'data_source': line_data_source[0],
+            })
+
+        json_file = os.path.join(json_folder, f"{self.global_steps}.json")
+        os.makedirs(json_folder, exist_ok=True)
+        with open(json_file, 'w') as f:
+            json.dump(aggragated_data, f, indent=4)
+
+
     def log_val_generations(self, inputs, outputs, scores, response_lengths, data_sources, ground_truth_answers):
         """save validation generations to json file"""
         # save as json file
@@ -931,6 +997,8 @@ class RayPPOTrainer(object):
                             self.global_steps % self.config.trainer.save_freq == 0:
                         with _timer('save_checkpoint', timing_raw):
                             self._save_checkpoint()
+
+                self.log_train_generations(batch=batch)
 
                 # collect metrics
                 metrics.update(compute_data_metrics(batch=batch, use_critic=self.use_critic))
