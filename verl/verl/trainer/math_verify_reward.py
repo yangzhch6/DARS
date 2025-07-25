@@ -80,6 +80,23 @@ def reward_fn_math_verify_no_think_no_code(solution_str: str, ground_truth: Unio
     reward_response = reward_fn(RewardInput(problem=solution_str, problem_type=RewardType.MATH, model_response=solution_str, ground_truth={"answer": ground_truth}))
     return reward_response.is_correct
 
+def extract_final_boxed_answer(solution_str: str):
+    """
+    Extracts the final boxed answer from the solution string.
+    Assumes the answer is formatted as \\boxed{answer}.
+    """
+    if "boxed{" in solution_str:
+        return solution_str.split("boxed{")[-1].split("}")[0].strip()
+    else:
+        return ""
+
+def reward_fn_true_false(solution_str: str, ground_truth: str):
+    final_boxed_answer = extract_final_boxed_answer(solution_str).lower()
+    if ground_truth.lower() == final_boxed_answer:
+        return True
+    else:
+        return False
+
 if __name__ == "__main__":
     # reward = RewardMathFn(RewardConfig)
     # import pandas as pd
