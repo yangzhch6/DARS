@@ -126,7 +126,7 @@ def apply_kl_penalty(data: DataProto, kl_ctrl: core_algos.AdaptiveKLController, 
     return data, metrics
 
 
-def compute_advantage(data: DataProto, adv_estimator, gamma=1.0, lam=1.0, grpo_use_std=False):
+def compute_advantage(data: DataProto, adv_estimator, clip_value=1.0, gamma=1.0, lam=1.0, grpo_use_std=False):
     # prepare response group
     # TODO: add other ways to estimate advantages
     if adv_estimator == 'gae':
@@ -154,6 +154,17 @@ def compute_advantage(data: DataProto, adv_estimator, gamma=1.0, lam=1.0, grpo_u
                                                                         eos_mask=response_mask,
                                                                         index=index,
                                                                         use_std=grpo_use_std)
+        data.batch['advantages'] = advantages
+        data.batch['returns'] = returns
+    elif adv_estimator == 'grpo-unbiased':
+        print("Using GRPO unbiased advantage estimator...")
+        token_level_rewards = data.batch['token_level_rewards']
+        index = data.non_tensor_batch['uid']
+        responses = data.batch['responses']
+        response_length = responses.size(-1)
+        attention_mask = data.batch['attention_mask']
+        response_mask = attention_mask[:, -response_length:]
+        advantages, returns = core_algos.compute_grpo_outcome_advantage_unbiased(token_level_rewards=token_level_rewards, eos_mask=response_mask, index=index, clip_value=clip_value)
         data.batch['advantages'] = advantages
         data.batch['returns'] = returns
     else:
@@ -648,6 +659,8 @@ class RayPPOTrainer(object):
             self.use_critic = True
         elif self.config.algorithm.adv_estimator == 'grpo':
             self.use_critic = False
+        elif self.config.algorithm.adv_estimator == 'grpo-unbiased':
+            self.use_critic = False
         else:
             raise NotImplementedError
 
@@ -957,6 +970,7 @@ class RayPPOTrainer(object):
                         # compute advantages, executed on the driver process
                         batch = compute_advantage(batch,
                                                   adv_estimator=self.config.algorithm.adv_estimator,
+                                                  clip_value=self.config.algorithm.clip_adv_value,
                                                   gamma=self.config.algorithm.gamma,
                                                   lam=self.config.algorithm.lam,
                                                   grpo_use_std=self.config.algorithm.grpo_use_std)

@@ -43,6 +43,7 @@ class SFTDataset(Dataset):
                  prompt_dict_keys=None,
                  response_key='response',
                  response_dict_keys=None,
+                 use_template=True,
                  max_length=1024,
                  truncation='error'):
         assert truncation in ['error', 'left', 'right']
@@ -62,6 +63,7 @@ class SFTDataset(Dataset):
         self.response_dict_keys = [] if not response_dict_keys else response_dict_keys
 
         self.max_length = max_length
+        self.use_template = use_template
 
         self._download()
         self._read_files_and_tokenize()
@@ -94,7 +96,8 @@ class SFTDataset(Dataset):
             except Exception:
                 print(f'self.prompts={self.prompts}')
                 raise
-        self.prompts = self.prompts.tolist()
+        self.prompts = self.prompts.values.tolist()
+        self.prompts = [item[0] for item in self.prompts]
         self.responses = self.dataframe[self.response_key]
         for key in self.response_dict_keys:
             try:
@@ -102,7 +105,8 @@ class SFTDataset(Dataset):
             except Exception:
                 print(f'self.responses={self.responses}')
                 raise
-        self.responses = self.responses.tolist()
+        self.responses = self.responses.values.tolist()
+        self.responses = [item[0] for item in self.responses]
 
     def __len__(self):
         return len(self.prompts)
@@ -113,11 +117,15 @@ class SFTDataset(Dataset):
         prompt = self.prompts[item]
         response = self.responses[item]
 
-        # apply chat template
-        prompt_chat = [{'role': 'user', 'content': prompt}]
+        if self.use_template:
+            # apply chat template
+            prompt_chat = [{'role': 'user', 'content': prompt}]
 
-        # string
-        prompt_chat_str = tokenizer.apply_chat_template(prompt_chat, add_generation_prompt=True, tokenize=False)
+            # string
+            prompt_chat_str = tokenizer.apply_chat_template(prompt_chat, add_generation_prompt=True, tokenize=False)
+        else:
+            # apply chat template
+            prompt_chat_str = prompt
         response_chat_str = response + tokenizer.eos_token
 
         # tokenize
