@@ -3,20 +3,22 @@ set -x
 
 # Warning: Export VLLM_ATTENTION_BACKEND on every machine before starting Ray cluster.
 # vLLM without XFORMERS will results in CUDA errors.
+export WANDB_API_KEY="004ba186f7e1f9bd08fe620ddeaaf98ef356c95f"
 export VLLM_ATTENTION_BACKEND=XFORMERS
-export MODEL_PATH="/hpc2hdd/home/zyang398/yangzhch6/models/LUFFY/LUFFY-Qwen-Math-1.5B-Zero"
-export CUDA_VISIBLE_DEVICES=0,1
+export MODEL_PATH="/mnt/weka/home/yongxin.wang/workspace/yangzhch6/models/Qwen/Qwen2.5-Math-7B-L"
+export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 
 # Train over a single node, 1 A100-80GB GPUs.
 python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=grpo \
-    data.train_files=/hpc2hdd/home/zyang398/yangzhch6/projs/RLVR-Data/luffy_prompt/deepscaler.parquet \
-    data.val_files=/hpc2hdd/home/zyang398/yangzhch6/projs/RLVR-Data/luffy_prompt/valid.parquet \
+    data.train_files=/mnt/weka/home/yongxin.wang/workspace/yangzhch6/RLVR-Data/nothink/openr1.parquet \
+    data.val_files=/mnt/weka/home/yongxin.wang/workspace/yangzhch6/RLVR-Data/nothink/valid.parquet \
     data.train_batch_size=128 \
     data.val_batch_size=512 \
     data.max_prompt_length=1024 \
-    data.max_response_length=8192 \
-    +data.reward_impl_version=1 \
+    data.max_response_length=3072 \
+    +data.use_template=True \
+    +data.reward_impl_version=3 \
     +actor_rollout_ref.ref.use_ref=False \
     actor_rollout_ref.model.path=$MODEL_PATH \
     actor_rollout_ref.actor.optim.lr=1e-6 \
@@ -40,15 +42,17 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.n_val=8 \
     actor_rollout_ref.ref.fsdp_config.param_offload=True \
     algorithm.kl_ctrl.kl_coef=0.000 \
+    +algorithm.clip_adv_value=1 \
     +algorithm.grpo_use_std=False \
     trainer.critic_warmup=0 \
     trainer.logger=['console','wandb'] \
     trainer.project_name='reasoning_baselines' \
-    trainer.experiment_name='LUFFY-1.5B-deepscaler-think-8k' \
+    trainer.experiment_name='Qwen2.5-Math-7B-L-openr1-nothink-3k' \
     +trainer.val_before_train=True \
-    trainer.n_gpus_per_node=2 \
+    trainer.n_gpus_per_node=8 \
     trainer.nnodes=1 \
     trainer.save_freq=50 \
     trainer.test_freq=50 \
     trainer.default_hdfs_dir=null \
+    trainer.total_training_steps=505 \
     trainer.total_epochs=30 "${@:1}"

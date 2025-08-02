@@ -1,12 +1,12 @@
 #!/bin/bash
-#SBATCH -o slurm/Qwen2.5-Math-7B-openr1-nothink-3k-%j.out
-#SBATCH --partition=i64m1tga800u
-#SBATCH -J 7bOR1
-#SBATCH -n 8
-#SBATCH --gres=gpu:4
+#SBATCH --time=7-00:00:00
+#SBATCH --nodes=1
+#SBATCH --exclusive
+#SBATCH --gres=gpu:8
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=64
+#SBATCH --output=/mnt/weka/home/yongxin.wang/workspace/yangzhch6/rvlr-baseline/slurm/train/Qwen2.5-Math-7B-openr1-nothink-3k.out
 
-module load cuda/12.4
+source /mnt/weka/home/yongxin.wang/miniconda3/bin/activate rlvr-baseline
 
-source /hpc2hdd/home/zyang398/yangzhch6/anaconda3/bin/activate rllm-baseline
-
-bash /hpc2hdd/home/zyang398/yangzhch6/projs/reasoning_baselines/rllm/scripts/train/Qwen2.5-Math-7B-openr1-nothink-3k.sh
+bash /mnt/weka/home/yongxin.wang/workspace/yangzhch6/rvlr-baseline/scripts/train/Qwen2.5-Math-7B-openr1-nothink-3k.sh
