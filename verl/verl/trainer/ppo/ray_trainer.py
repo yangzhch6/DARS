@@ -710,6 +710,30 @@ class RayPPOTrainer(object):
             critic_local_path = os.path.join(local_global_step_folder, 'critic_huggingface')
             self.critic_wg.save_checkpoint_higgingface(critic_local_path)
 
+
+    def maybe_save_best_hf(self, val_metrics):
+        import json
+        actor_local_path = os.path.join(self.config.trainer.default_local_dir, 'best', f'actor')
+
+        os.makedirs(actor_local_path, exist_ok=True)
+        if os.path.exists(f'{actor_local_path}/metrics.json'):
+            with open(f'{actor_local_path}/metrics.json', 'r') as f:
+                metrics = json.load(f)
+            best_score = metrics['best_avg_score']
+        else:
+            print('Find no current best saved. Best score is set to -inf')
+            best_score = -float('inf')
+        
+        cur_score = val_metrics['avg_score']
+        
+        if cur_score > best_score:
+            print(f'Saving best checkpoint with score {cur_score} at {actor_local_path}')
+            best_score = cur_score
+            self.actor_rollout_wg.save_checkpoint_hf(actor_local_path)
+            with open(f'{actor_local_path}/metrics.json', 'w') as f:
+                f.write(json.dumps({'best_avg_score': best_score, 'global_step': self.global_steps})+'\n')
+
+
     def _save_checkpoint(self):
         self._save_checkpoint_huggingface()
         
@@ -747,9 +771,9 @@ class RayPPOTrainer(object):
         torch.cuda.empty_cache()
         # sleep(30)
 
-        ## delete last checkpoint actor
+        ## delete last checkpoint
         last_ckpt_path = os.path.join(self.config.trainer.default_local_dir,
-                                                f'global_step_{self.global_steps - self.config.trainer.save_freq}', 'actor')
+                                                f'global_step_{self.global_steps - self.config.trainer.save_freq}')
         import shutil
         if os.path.exists(last_ckpt_path) and os.path.isdir(last_ckpt_path):
             shutil.rmtree(last_ckpt_path)
@@ -994,6 +1018,7 @@ class RayPPOTrainer(object):
                         if 'avg_score' not in val_metrics:
                             val_metrics['avg_score'] = np.mean([val_metrics[key] for key in val_metrics if key.startswith('val/test_score/')])
                         metrics.update(val_metrics)
+                        self.maybe_save_best_hf(val_metrics)
 
                     if self.config.trainer.save_freq > 0 and \
                             self.global_steps % self.config.trainer.save_freq == 0:
