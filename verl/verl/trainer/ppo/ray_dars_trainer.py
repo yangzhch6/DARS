@@ -846,6 +846,28 @@ class RayPPOTrainer(object):
         if isinstance(self.train_dataloader.dataset, RLHFDataset):
             self.train_dataloader.dataset.resume_dataset_state()
 
+    def maybe_save_best_hf(self, val_metrics):
+        import json
+        actor_local_path = os.path.join(self.config.trainer.default_local_dir, 'best', f'actor')
+
+        os.makedirs(actor_local_path, exist_ok=True)
+        if os.path.exists(f'{actor_local_path}/metrics.json'):
+            with open(f'{actor_local_path}/metrics.json', 'r') as f:
+                metrics = json.load(f)
+            best_score = metrics['best_avg_score']
+        else:
+            print('Find no current best saved. Best score is set to -inf')
+            best_score = -float('inf')
+        
+        cur_score = val_metrics['avg_score']
+        
+        if cur_score > best_score:
+            print(f'Saving best checkpoint with score {cur_score} at {actor_local_path}')
+            best_score = cur_score
+            self.actor_rollout_wg.save_checkpoint_hf(actor_local_path)
+            with open(f'{actor_local_path}/metrics.json', 'w') as f:
+                f.write(json.dumps({'best_avg_score': best_score, 'global_step': self.global_steps})+'\n')
+                
     def _balance_batch(self, batch: DataProto, metrics, logging_prefix='global_seqlen'):
         """Reorder the data on single controller such that each dp rank gets similar total tokens"""
         attention_mask = batch.batch['attention_mask']
@@ -1123,6 +1145,7 @@ class RayPPOTrainer(object):
                         if 'avg_score' not in val_metrics:
                             val_metrics['avg_score'] = np.mean([val_metrics[key] for key in val_metrics if key.startswith('val/test_score/')])
                         metrics.update(val_metrics)
+                        self.maybe_save_best_hf(val_metrics)
 
                     if self.config.trainer.save_freq > 0 and \
                             self.global_steps % self.config.trainer.save_freq == 0:
@@ -1130,8 +1153,6 @@ class RayPPOTrainer(object):
                             self._save_checkpoint()
                 
                 self.log_train_generations(batch=batch)
-
-                exit()
 
                 # collect metrics
                 metrics.update(compute_data_metrics(batch=batch, use_critic=self.use_critic))
