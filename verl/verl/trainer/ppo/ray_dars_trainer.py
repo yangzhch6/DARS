@@ -755,11 +755,11 @@ class RayPPOTrainer(object):
                                                 f'global_step_{self.global_steps}')
         actor_local_path = os.path.join(local_global_step_folder, 'actor_huggingface')
 
-        self.actor_rollout_wg.save_checkpoint_higgingface(actor_local_path)
+        self.actor_rollout_wg.save_checkpoint_huggingface(actor_local_path)
 
         if self.use_critic:
             critic_local_path = os.path.join(local_global_step_folder, 'critic_huggingface')
-            self.critic_wg.save_checkpoint_higgingface(critic_local_path)
+            self.critic_wg.save_checkpoint_huggingface(critic_local_path)
 
     def _save_checkpoint(self):
         self._save_checkpoint_huggingface()
@@ -862,9 +862,13 @@ class RayPPOTrainer(object):
         cur_score = val_metrics['avg_score']
         
         if cur_score > best_score:
+            import shutil
+            if os.path.exists(actor_local_path) and os.path.isdir(actor_local_path):
+                shutil.rmtree(actor_local_path)
+
             print(f'Saving best checkpoint with score {cur_score} at {actor_local_path}')
             best_score = cur_score
-            self.actor_rollout_wg.save_checkpoint_hf(actor_local_path)
+            self.actor_rollout_wg.save_checkpoint_huggingface(actor_local_path)
             with open(f'{actor_local_path}/metrics.json', 'w') as f:
                 f.write(json.dumps({'best_avg_score': best_score, 'global_step': self.global_steps})+'\n')
                 
@@ -938,8 +942,8 @@ class RayPPOTrainer(object):
 
                 original_input_batch = copy.deepcopy(batch)
                 
-                print(batch)
-                print("="*60)
+                # print(batch)
+                # print("="*60)
 
                 with _timer('step', timing_raw):
                     ## ------- First Sampling ------- ##
@@ -962,8 +966,8 @@ class RayPPOTrainer(object):
 
                     ## ------- Second Sampling ------- ##
                     id2mean = get_id2mean(batch)
-                    print(f"ID2Mean: {id2mean}")
-                    print("="*60)
+                    # print(f"ID2Mean: {id2mean}")
+                    # print("="*60)
                     
                     second_batch = []
                     for i in range(len(original_input_batch)):
@@ -1001,9 +1005,9 @@ class RayPPOTrainer(object):
                         second_batch.pop(['input_ids', 'attention_mask', 'position_ids'])
                         second_batch = second_batch.union(second_batch_gen)
                     
-                    print("="*60)
-                    print("## 2nd gened batch")
-                    print(second_batch)
+                    # print("="*60)
+                    # print("## 2nd gened batch")
+                    # print(second_batch)
 
                     with _timer('score-2', timing_raw):
                         # compute scores using reward model and/or reward function
@@ -1017,16 +1021,16 @@ class RayPPOTrainer(object):
                         else:
                             reward_tensor = second_batch.batch['token_level_scores']
                         
-                    print("="*60)
-                    print("## 2nd batch")
-                    print(second_batch)
+                    # print("="*60)
+                    # print("## 2nd batch")
+                    # print(second_batch)
                     
                     ## ------- Combine and Pad ------- ##
                     
                     combined_batch = DataProto.concat([second_batch, batch])
-                    print("="*60)
-                    print("## combined batch")
-                    print(combined_batch)
+                    # print("="*60)
+                    # print("## combined batch")
+                    # print(combined_batch)
 
                     id2mean = get_id2mean(combined_batch)
                     filtered_batch = []
@@ -1038,7 +1042,7 @@ class RayPPOTrainer(object):
                         if line_acc < 1 and line_acc > 0:
                             filtered_batch.append(combined_batch[i])
                     
-                    print("len of filtered batch: ", len(filtered_batch))
+                    # print("len of filtered batch: ", len(filtered_batch))
                     
                     target_chunk = self.actor_rollout_wg.world_size // self.config.actor_rollout_ref.actor.ulysses_sequence_parallel_size
                     pad_count = target_chunk - len(filtered_batch) % target_chunk
@@ -1049,10 +1053,10 @@ class RayPPOTrainer(object):
                         pad_item.batch['token_level_scores'] = torch.zeros_like(pad_item.batch['token_level_scores'])
                         filtered_batch += [pad_item] * pad_count
                     filtered_batch = protocol.collate_fn(filtered_batch)
-                    print("="*60)
-                    print("## padded batch")
-                    print(filtered_batch)
-                    print("len of filtered batch after padding: ", len(filtered_batch))
+                    # print("="*60)
+                    # print("## padded batch")
+                    # print(filtered_batch)
+                    # print("len of filtered batch after padding: ", len(filtered_batch))
                     
                     batch = filtered_batch
                     
@@ -1145,7 +1149,7 @@ class RayPPOTrainer(object):
                         if 'avg_score' not in val_metrics:
                             val_metrics['avg_score'] = np.mean([val_metrics[key] for key in val_metrics if key.startswith('val/test_score/')])
                         metrics.update(val_metrics)
-                        self.maybe_save_best_hf(val_metrics)
+                        # self.maybe_save_best_hf(val_metrics)
 
                     if self.config.trainer.save_freq > 0 and \
                             self.global_steps % self.config.trainer.save_freq == 0:

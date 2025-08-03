@@ -603,7 +603,7 @@ class ActorRolloutRefWorker(Worker):
             offload_fsdp_model_to_cpu(self.actor_module_fsdp)
 
     @register(dispatch_mode=Dispatch.ONE_TO_ALL)
-    def save_checkpoint_higgingface(self, local_path, hdfs_path=None):
+    def save_checkpoint_huggingface(self, local_path, hdfs_path=None):
         assert self._is_actor
         import torch
         if self._is_offload_param:
@@ -902,7 +902,7 @@ class CriticWorker(Worker):
             offload_fsdp_model_to_cpu(self.critic_module)
 
     @register(dispatch_mode=Dispatch.ONE_TO_ALL)
-    def save_checkpoint_higgingface(self, local_path, hdfs_path=None):
+    def save_checkpoint_higgungface(self, local_path, hdfs_path=None):
         import torch
         if self._is_offload_param:
             load_fsdp_param_and_grad(module=self.critic_module,

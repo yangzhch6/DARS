@@ -1,19 +1,18 @@
 #!/bin/bash
 set -x
 
-ray stop 
-
 # Warning: Export VLLM_ATTENTION_BACKEND on every machine before starting Ray cluster.
 # vLLM without XFORMERS will results in CUDA errors.
+export WANDB_API_KEY="004ba186f7e1f9bd08fe620ddeaaf98ef356c95f"
 export VLLM_ATTENTION_BACKEND=XFORMERS
-export MODEL_PATH="/hpc2hdd/home/zyang398/yangzhch6/models/Qwen/Qwen2.5-Math-1.5B"
-export CUDA_VISIBLE_DEVICES=0,1
+export MODEL_PATH="/mnt/weka/home/yongxin.wang/workspace/lark/models/Qwen/Qwen2.5-Math-1.5B"
+export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 
 # Train over a single node, 1 A100-80GB GPUs.
 python3 -m verl.trainer.main_ppo_dars \
     algorithm.adv_estimator=grpo \
-    data.train_files=/hpc2hdd/home/zyang398/yangzhch6/projs/RLVR-Data/nothink/openr1.parquet \
-    data.val_files=/hpc2hdd/home/zyang398/yangzhch6/projs/RLVR-Data/nothink/valid.parquet \
+    data.train_files=/mnt/weka/home/yongxin.wang/workspace/lark/RLVR-Data/nothink/openr1.parquet \
+    data.val_files=/mnt/weka/home/yongxin.wang/workspace/lark/RLVR-Data/nothink/capacity_val_1k.parquet \
     data.train_batch_size=128 \
     data.val_batch_size=512 \
     data.max_prompt_length=1024 \
@@ -52,10 +51,10 @@ python3 -m verl.trainer.main_ppo_dars \
     trainer.project_name='DARS' \
     trainer.experiment_name='Qwen2.5-Math-1.5B-openr1-nothink-3k-func1-bs128-pp2' \
     +trainer.val_before_train=False \
-    trainer.n_gpus_per_node=2 \
+    trainer.n_gpus_per_node=8 \
     trainer.nnodes=1 \
-    trainer.save_freq=25 \
-    trainer.test_freq=25 \
-    trainer.total_training_steps=503 \
+    trainer.save_freq=10 \
+    trainer.test_freq=10 \
+    trainer.total_training_steps=12 \
     trainer.default_hdfs_dir=null \
     trainer.total_epochs=30 "${@:1}"
