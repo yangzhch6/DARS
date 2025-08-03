@@ -1032,6 +1032,8 @@ class RayPPOTrainer(object):
                     # print("## combined batch")
                     # print(combined_batch)
 
+                    upper_threshold = self.config.algorithm.get('upper_threshold', 1),
+
                     id2mean = get_id2mean(combined_batch)
                     filtered_batch = []
                     for i in range(len(combined_batch)):
@@ -1039,7 +1041,7 @@ class RayPPOTrainer(object):
                         line_acc = id2mean[line_uid]
                         # print(line_uid, line_acc)
 
-                        if line_acc < 1 and line_acc > 0:
+                        if line_acc < upper_threshold and line_acc > 0:
                             filtered_batch.append(combined_batch[i])
                     
                     # print("len of filtered batch: ", len(filtered_batch))

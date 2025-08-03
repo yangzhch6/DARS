@@ -45,11 +45,12 @@ python3 -m verl.trainer.main_ppo_dars \
     actor_rollout_ref.rollout.n_val=128 \
     actor_rollout_ref.ref.fsdp_config.param_offload=True \
     algorithm.kl_ctrl.kl_coef=0.000 \
+    +algorithm.upper_threshold=0.5 \
     +algorithm.grpo_use_std=False \
     trainer.critic_warmup=0 \
     trainer.logger=['console','wandb'] \
     trainer.project_name='DARS' \
-    trainer.experiment_name='Qwen2.5-Math-1.5B-openr1-nothink-3k-func1-bs128-pp2' \
+    trainer.experiment_name='Qwen2.5-Math-1.5B-openr1-nothink-3k-func1-bs128-pp2-t0.5' \
     +trainer.val_before_train=False \
     trainer.n_gpus_per_node=8 \
     trainer.nnodes=1 \
