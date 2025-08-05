@@ -773,7 +773,8 @@ class RayPPOTrainer(object):
 
         ## delete last checkpoint
         last_ckpt_path = os.path.join(self.config.trainer.default_local_dir,
-                                                f'global_step_{self.global_steps - self.config.trainer.save_freq}')
+                                                f'global_step_{self.global_steps - self.config.trainer.save_freq}',
+                                                'actor')
         import shutil
         if os.path.exists(last_ckpt_path) and os.path.isdir(last_ckpt_path):
             shutil.rmtree(last_ckpt_path)
@@ -1018,7 +1019,7 @@ class RayPPOTrainer(object):
                         if 'avg_score' not in val_metrics:
                             val_metrics['avg_score'] = np.mean([val_metrics[key] for key in val_metrics if key.startswith('val/test_score/')])
                         metrics.update(val_metrics)
-                        self.maybe_save_best_hf(val_metrics)
+                        # self.maybe_save_best_hf(val_metrics)
 
                     if self.config.trainer.save_freq > 0 and \
                             self.global_steps % self.config.trainer.save_freq == 0:
