@@ -197,7 +197,7 @@ class vLLMRollout(BaseRollout):
         if not do_sample:
             kwargs = {
                 'best_of': 1,
-                'top_p': 0.95,
+                'top_p': 1.0,
                 'top_k': -1,
                 'min_p': 0.0,
                 'temperature': 0,
@@ -208,12 +208,16 @@ class vLLMRollout(BaseRollout):
             kwargs['temperature'] = prompts.meta_info['val_temperature']
             is_validation = True
 
+        if prompts.meta_info.get('temperature', None):
+            kwargs['temperature'] = prompts.meta_info['temperature']
+
         kwargs['n'] = 1
         if do_sample:
             idx_list = [deepcopy(item) for item in idx_list for _ in range(self.config.n)]
 
         # Generate sequences
         with self.update_sampling_params(**kwargs):
+            print(self.sampling_params)
             output = self.inference_engine.generate(
                 prompts=None,
                 sampling_params=self.sampling_params,

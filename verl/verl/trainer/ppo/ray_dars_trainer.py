@@ -990,6 +990,7 @@ class RayPPOTrainer(object):
                         'recompute_log_prob': False,
                         'do_sample': False,
                         'validate': True,
+                        'temperature': self.config.actor_rollout_ref.rollout.temperature,
                     }
 
                     # generate a batch
@@ -997,6 +998,7 @@ class RayPPOTrainer(object):
                         print("## generating")
                         # pad
                         second_batch_padded, pad_size = pad_dataproto_to_divisor(second_batch, self.actor_rollout_wg.world_size)
+                        # print(second_batch_padded.meta_info)
                         # gen
                         second_batch_gen_padded = self.actor_rollout_wg.generate_sequences(second_batch_padded)
                         # unpad
@@ -1032,18 +1034,33 @@ class RayPPOTrainer(object):
                     # print("## combined batch")
                     # print(combined_batch)
 
-                    upper_threshold = self.config.algorithm.get('upper_threshold', 1),
+                    upper_threshold = self.config.algorithm.get('upper_threshold', 1.0)
+                    # print(upper_threshold, type(upper_threshold))
 
-                    id2mean = get_id2mean(combined_batch)
+                    id2mean_combined = get_id2mean(combined_batch)
                     filtered_batch = []
                     for i in range(len(combined_batch)):
                         line_uid = combined_batch[i].non_tensor_batch["uid"]
-                        line_acc = id2mean[line_uid]
+                        line_acc = id2mean_combined[line_uid]
                         # print(line_uid, line_acc)
 
                         if line_acc < upper_threshold and line_acc > 0:
                             filtered_batch.append(combined_batch[i])
                     
+                    if len(filtered_batch) == 0:
+                        print("No valid samples left after filtering. Skipping this batch.")
+                        continue
+                    
+                    print(f"Filtered batch size: {len(filtered_batch)}")
+
+                    saved_2nd_sample_count = 0
+                    for uid in id2mean_combined:
+                        if id2mean[uid] < 1e-6 and id2mean_combined[uid] > 1e-6:
+                            saved_2nd_sample_count += 1
+                    print(f"2nd saved sample: {saved_2nd_sample_count} / {len(id2mean_combined)}")
+                    metrics['2nd_saved'] = saved_2nd_sample_count / len(id2mean_combined)
+
+
                     # print("len of filtered batch: ", len(filtered_batch))
                     
                     target_chunk = self.actor_rollout_wg.world_size // self.config.actor_rollout_ref.actor.ulysses_sequence_parallel_size
@@ -1065,10 +1082,10 @@ class RayPPOTrainer(object):
                     solve_none = 0
                     solve_all = 0
                     solve_partial = 0
-                    for uid in id2mean:
-                        if id2mean[uid] < 1e-6:
+                    for uid in id2mean_combined:
+                        if id2mean_combined[uid] < 1e-6:
                             solve_none += 1
-                        elif id2mean[uid] < 1 - 1e-6:
+                        elif id2mean_combined[uid] < 1 - 1e-6:
                             solve_partial += 1
                         else:
                             solve_all += 1
