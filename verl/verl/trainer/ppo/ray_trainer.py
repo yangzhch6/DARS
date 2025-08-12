@@ -786,6 +786,7 @@ class RayPPOTrainer(object):
         # load from hdfs
         if self.config.trainer.default_hdfs_dir is not None:
             NotImplementedError('load from hdfs is not implemented yet')
+            return 0
         else:
             checkpoint_folder = self.config.trainer.default_local_dir  # TODO: check path
             if not os.path.isabs(checkpoint_folder):
@@ -822,6 +823,8 @@ class RayPPOTrainer(object):
         from verl.utils.dataset.rl_dataset import RLHFDataset
         if isinstance(self.train_dataloader.dataset, RLHFDataset):
             self.train_dataloader.dataset.resume_dataset_state()
+        
+        return 1
 
     def _balance_batch(self, batch: DataProto, metrics, logging_prefix='global_seqlen'):
         """Reorder the data on single controller such that each dp rank gets similar total tokens"""
@@ -860,7 +863,7 @@ class RayPPOTrainer(object):
             self.global_steps = 0
 
         # load checkpoint before doing anything
-        self._load_checkpoint()
+        is_load_ckpt = self._load_checkpoint()
         # print(f'Loaded checkpoint from {self.config.trainer.default_local_dir}')
         print(f'Current global step: {self.global_steps}')
 
@@ -877,9 +880,17 @@ class RayPPOTrainer(object):
         # we start from step 1
         self.global_steps += 1
 
+        if is_load_ckpt:
+            skip_load_steps = (self.global_steps-1) % len(self.train_dataloader)
+            print("## Skipping load steps:", skip_load_steps)
+
         for _ in range(self.config.trainer.total_epochs):
             
             for batch_dict in self.train_dataloader:
+                if is_load_ckpt and skip_load_steps > 0:
+                    skip_load_steps -= 1
+                    continue
+                    
                 batch: DataProto = DataProto.from_single_dict(batch_dict)
 
                 metrics = {}
