@@ -819,10 +819,14 @@ class RayPPOTrainer(object):
         # load dataloader,
         # TODO: from remote not implemented yet
         dataloader_local_path = os.path.join(global_step_folder, 'data.pt')
-        self.train_dataloader = torch.load(dataloader_local_path)
-        from verl.utils.dataset.rl_dataset import RLHFDataset
-        if isinstance(self.train_dataloader.dataset, RLHFDataset):
-            self.train_dataloader.dataset.resume_dataset_state()
+        # if exist dataloader_local_path:
+        if os.path.exists(dataloader_local_path):
+            self.train_dataloader = torch.load(dataloader_local_path)
+            from verl.utils.dataset.rl_dataset import RLHFDataset
+            if isinstance(self.train_dataloader.dataset, RLHFDataset):
+                self.train_dataloader.dataset.resume_dataset_state()
+        else:
+            print("## Warning: training data ckpt path not exist!")
         
         return 1
 
@@ -1053,9 +1057,9 @@ class RayPPOTrainer(object):
 
                 if self.global_steps >= self.total_training_steps:
 
-                    # perform validation after training
-                    if self.val_reward_fn is not None:
-                        val_metrics = self._validate()
-                        pprint(f'Final validation metrics: {val_metrics}')
-                        logger.log(data=val_metrics, step=self.global_steps)
+                    # # perform validation after training
+                    # if self.val_reward_fn is not None:
+                    #     val_metrics = self._validate()
+                    #     pprint(f'Final validation metrics: {val_metrics}')
+                    #     logger.log(data=val_metrics, step=self.global_steps)
                     return
