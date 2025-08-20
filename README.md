@@ -28,14 +28,14 @@ set -x
 # vLLM without XFORMERS will results in CUDA errors.
 export WANDB_API_KEY="004ba186f7e1f9bd08fe620ddeaaf98ef356c95f"
 export VLLM_ATTENTION_BACKEND=XFORMERS
-export MODEL_PATH="/mnt/weka/home/yongxin.wang/workspace/lark/models/Qwen/Qwen2.5-Math-1.5B"
+export MODEL_PATH="$PATH/models/Qwen/Qwen2.5-Math-1.5B"
 export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 
 # Train over a single node, 1 A100-80GB GPUs.
 python3 -m verl.trainer.main_ppo_dars \
     algorithm.adv_estimator=grpo \
-    data.train_files=/mnt/weka/home/yongxin.wang/workspace/lark/RLVR-Data/nothink/openr1.parquet \
-    data.val_files=/mnt/weka/home/yongxin.wang/workspace/lark/RLVR-Data/nothink/capacity_train_and_val.parquet \
+    data.train_files=$PATH/RLVR-Data/nothink/openr1.parquet \
+    data.val_files=$PATH/RLVR-Data/nothink/capacity_train_and_val.parquet \
     data.train_batch_size=3072 \
     data.val_batch_size=512 \
     data.max_prompt_length=1024 \
@@ -85,4 +85,4 @@ python3 -m verl.trainer.main_ppo_dars \
 
 
 ## Run grpo baseline
-refer to ...
+refer to [https://github.com/yangzhch6/rlvr-baseline](https://github.com/yangzhch6/rlvr-baseline)
