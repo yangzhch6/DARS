@@ -1,7 +1,7 @@
+> The official implemention of [Depth-Breadth Synergy in RLVR: Unlocking LLM Reasoning Gains with Adaptive Exploration](https://arxiv.org/abs/2508.13755v1)
+
 ## Prepare Data
-
-
-
+...
 
 ## Install
 
