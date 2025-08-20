@@ -607,7 +607,10 @@ class RayPPOTrainer(object):
 
         metric_dict = {}
         for data_source, rewards in data_source_reward.items():
-            metric_dict[f'val/test_score/{data_source}'] = np.mean(rewards)
+            if data_source == "train":
+                metric_dict[f'train/score/{data_source}'] = np.mean(rewards)
+            else:
+                metric_dict[f'val/test_score/{data_source}'] = np.mean(rewards)
 
             # compute response avg length
             metric_dict[f'val_global_response_length_mean/{data_source}'] = np.mean(data_source_length[data_source])

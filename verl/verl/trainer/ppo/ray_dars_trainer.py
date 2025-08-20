@@ -658,7 +658,10 @@ class RayPPOTrainer(object):
 
         metric_dict = {}
         for data_source, rewards in data_source_reward.items():
-            metric_dict[f'val/test_score/{data_source}'] = np.mean(rewards)
+            if data_source == "train":
+                metric_dict[f'train/score/{data_source}'] = np.mean(rewards)
+            else:
+                metric_dict[f'val/test_score/{data_source}'] = np.mean(rewards)
 
             # compute response avg length
             metric_dict[f'val_global_response_length_mean/{data_source}'] = np.mean(data_source_length[data_source])
@@ -809,6 +812,7 @@ class RayPPOTrainer(object):
         # load from hdfs
         if self.config.trainer.default_hdfs_dir is not None:
             NotImplementedError('load from hdfs is not implemented yet')
+            return 0
         else:
             checkpoint_folder = self.config.trainer.default_local_dir  # TODO: check path
             if not os.path.isabs(checkpoint_folder):
@@ -845,6 +849,8 @@ class RayPPOTrainer(object):
         from verl.utils.dataset.rl_dataset import RLHFDataset
         if isinstance(self.train_dataloader.dataset, RLHFDataset):
             self.train_dataloader.dataset.resume_dataset_state()
+        
+        return 1
 
     def maybe_save_best_hf(self, val_metrics):
         import json
@@ -909,7 +915,7 @@ class RayPPOTrainer(object):
             self.global_steps = 0
 
         # load checkpoint before doing anything
-        self._load_checkpoint()
+        is_load_ckpt = self._load_checkpoint()
         # print(f'Loaded checkpoint from {self.config.trainer.default_local_dir}')
         print(f'Current global step: {self.global_steps}')
 
@@ -928,9 +934,17 @@ class RayPPOTrainer(object):
 
         resample_func = select_resample_func(self.config.data.resampling_func)
 
+        if is_load_ckpt:
+            skip_load_steps = (self.global_steps-1) % len(self.train_dataloader)
+            print("## Skipping load steps:", skip_load_steps)
+
         for _ in range(self.config.trainer.total_epochs):
             
             for batch_dict in self.train_dataloader:
+                if is_load_ckpt and skip_load_steps > 0:
+                    skip_load_steps -= 1
+                    continue
+
                 batch: DataProto = DataProto.from_single_dict(batch_dict)
 
                 metrics = {}
