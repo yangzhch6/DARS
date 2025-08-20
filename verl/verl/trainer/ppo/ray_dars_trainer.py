@@ -19,6 +19,7 @@ This trainer supports model-agonistic model initialization with huggingface
 import os
 import json
 import uuid
+import math
 from time import sleep
 from contextlib import contextmanager
 from dataclasses import dataclass, field
@@ -178,42 +179,83 @@ def reduce_metrics(metrics: dict):
     return metrics
 
 
-def resample_func1(acc):
-    if not (0 <= acc <= 1):
-        raise ValueError("输入的 accuracy 值必须在 0 到 1 之间。")
-
+def schedule_ET(acc, N, N_max, std=False):
     if acc <= 1e-6:
-        return 32
-    elif acc <= 1/8+1e-6:
-        return 18
-    elif acc <= 2/8+1e-6:
-        return 11
-    elif acc <= 3/8+1e-6:
-        return 9
+        return N_max 
+    
+    if std: # 2 sqrt(acc * (1-acc))
+        S_acc = 2 * math.sqrt(acc * (1-acc))
+        A_g_peak = N
     else:
-        return 8
+        S_acc =  2 * acc * (1-acc)
+        A_g_peak = 0.5 * N
+    
+    A_g_current = 2 * N * S_acc
 
-def resample_func2(acc):
-    if not (0 <= acc <= 1):
-        raise ValueError("输入的 accuracy 值必须在 0 到 1 之间。")
+    delt_N = A_g_peak - A_g_current
+    delt_N /= S_acc
 
+    delt_N = min(math.ceil(delt_N), N_max)
+
+    return delt_N
+
+def schedule_HW(acc, N, N_max, std=False):
     if acc <= 1e-6:
-        return 48
-    elif acc <= 1/8+1e-6:
-        return 24
-    elif acc <= 2/8+1e-6:
-        return 12
-    elif acc <= 3/8+1e-6:
-        return 9
+        return N_max 
+    
+    if std: # 2 sqrt(acc * (1-acc))
+        S_acc = 2 * math.sqrt(acc * (1-acc))
+        A_g_peak = N
     else:
-        return 8
+        S_acc =  2 * acc * (1-acc)
+        A_g_peak = 0.5 * N
+    
+    A_g_current = 2 * N * S_acc
+
+    delt_N = 2 * (1 - acc) * A_g_peak - A_g_current
+    delt_N /= S_acc
+
+    delt_N = min(math.ceil(delt_N), N_max)
+
+    return delt_N
+
+
+# def resample_func1(acc):
+#     if not (0 <= acc <= 1):
+#         raise ValueError("输入的 accuracy 值必须在 0 到 1 之间。")
+
+#     if acc <= 1e-6:
+#         return 32
+#     elif acc <= 1/8+1e-6:
+#         return 18
+#     elif acc <= 2/8+1e-6:
+#         return 11
+#     elif acc <= 3/8+1e-6:
+#         return 9
+#     else:
+#         return 8
+
+# def resample_func2(acc):
+#     if not (0 <= acc <= 1):
+#         raise ValueError("输入的 accuracy 值必须在 0 到 1 之间。")
+
+#     if acc <= 1e-6:
+#         return 48
+#     elif acc <= 1/8+1e-6:
+#         return 24
+#     elif acc <= 2/8+1e-6:
+#         return 12
+#     elif acc <= 3/8+1e-6:
+#         return 9
+#     else:
+#         return 8
 
 
 def select_resample_func(func_id):
     if func_id == 1:
-        return resample_func1
+        return schedule_ET
     elif func_id == 2:
-        return resample_func2
+        return schedule_HW
     else:
         raise NotImplementedError(f'Unknown resampling function id: {func_id}')
 
@@ -989,10 +1031,12 @@ class RayPPOTrainer(object):
                         line_acc = id2mean[line_uid]
                         # print(line_uid, line_acc)
 
-                        repeat_times = resample_func(line_acc) - self.config.actor_rollout_ref.rollout.n
-                        if repeat_times > 0:
+                        # schedule_HW(acc, N, N_max, std=False):
+                        delt_n = resample_func(line_acc, self.config.actor_rollout_ref.rollout.n, 32, self.config.algorithm.grpo_use_std)
+
+                        if delt_n > 0:
                             # repeat the batch
-                            second_batch += [original_input_batch[i]] * repeat_times
+                            second_batch += [original_input_batch[i]] * delt_n
 
                     ## aggregate the selected samples
                     second_batch = protocol.collate_fn(second_batch)
