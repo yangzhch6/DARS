@@ -183,6 +183,9 @@ def schedule_ET(acc, N, N_max, std=False):
     if acc <= 1e-6:
         return N_max 
     
+    if acc >= 0.5:
+        return 0
+    
     if std: # 2 sqrt(acc * (1-acc))
         S_acc = 2 * math.sqrt(acc * (1-acc))
         A_g_peak = N
@@ -202,6 +205,9 @@ def schedule_ET(acc, N, N_max, std=False):
 def schedule_HW(acc, N, N_max, std=False):
     if acc <= 1e-6:
         return N_max 
+    
+    if acc >= 0.5:
+        return 0
     
     if std: # 2 sqrt(acc * (1-acc))
         S_acc = 2 * math.sqrt(acc * (1-acc))
