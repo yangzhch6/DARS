@@ -775,9 +775,14 @@ class RayPPOTrainer(object):
         # sleep(30)
 
         ## delete last checkpoint
-        last_ckpt_path = os.path.join(self.config.trainer.default_local_dir,
-                                                f'global_step_{self.global_steps - self.config.trainer.save_freq}',
-                                                'actor')
+        
+        if self.config.trainer.get('del_last_ckpt', False):
+            last_ckpt_path = os.path.join(self.config.trainer.default_local_dir,
+                            f'global_step_{self.global_steps - self.config.trainer.save_freq}')
+        else:
+            last_ckpt_path = os.path.join(self.config.trainer.default_local_dir,
+                            f'global_step_{self.global_steps - self.config.trainer.save_freq}',
+                            'actor')
         import shutil
         if os.path.exists(last_ckpt_path) and os.path.isdir(last_ckpt_path):
             shutil.rmtree(last_ckpt_path)
@@ -874,8 +879,8 @@ class RayPPOTrainer(object):
         # perform validation before training
         if self.val_reward_fn is not None and self.config.trainer.get('val_before_train', True):
             val_metrics = self._validate()
-            if 'avg_score' not in val_metrics:
-                val_metrics['avg_score'] = np.mean([val_metrics[key] for key in val_metrics if key.startswith('val/test_score/')])
+            # if 'avg_score' not in val_metrics:
+            #     val_metrics['avg_score'] = np.mean([val_metrics[key] for key in val_metrics if key.startswith('val/test_score/')])
             pprint(f'Initial validation metrics: {val_metrics}')
             logger.log(data=val_metrics, step=self.global_steps)
             if self.config.trainer.get('val_only', False):
@@ -1034,8 +1039,8 @@ class RayPPOTrainer(object):
                         self.global_steps % self.config.trainer.test_freq == 0:
                         with _timer('testing', timing_raw):
                             val_metrics: dict = self._validate()
-                        if 'avg_score' not in val_metrics:
-                            val_metrics['avg_score'] = np.mean([val_metrics[key] for key in val_metrics if key.startswith('val/test_score/')])
+                        # if 'avg_score' not in val_metrics:
+                        #     val_metrics['avg_score'] = np.mean([val_metrics[key] for key in val_metrics if key.startswith('val/test_score/')])
                         metrics.update(val_metrics)
                         # self.maybe_save_best_hf(val_metrics)
 
@@ -1044,7 +1049,8 @@ class RayPPOTrainer(object):
                         with _timer('save_checkpoint', timing_raw):
                             self._save_checkpoint()
 
-                self.log_train_generations(batch=batch)
+                if self.config.trainer.get('log_train', False):
+                    self.log_train_generations(batch=batch)
 
                 # collect metrics
                 metrics.update(compute_data_metrics(batch=batch, use_critic=self.use_critic))
