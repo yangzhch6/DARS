@@ -193,7 +193,7 @@ def schedule_ET(acc, N, N_max, std=False):
         S_acc =  2 * acc * (1-acc)
         A_g_peak = 0.5 * N
     
-    A_g_current = 2 * N * S_acc
+    A_g_current = N * S_acc
 
     delt_N = A_g_peak - A_g_current
     delt_N /= S_acc
@@ -216,7 +216,7 @@ def schedule_HW(acc, N, N_max, std=False):
         S_acc =  2 * acc * (1-acc)
         A_g_peak = 0.5 * N
     
-    A_g_current = 2 * N * S_acc
+    A_g_current = N * S_acc
 
     delt_N = 2 * (1 - acc) * A_g_peak - A_g_current
     delt_N /= S_acc
@@ -225,36 +225,6 @@ def schedule_HW(acc, N, N_max, std=False):
 
     return delt_N
 
-
-# def resample_func1(acc):
-#     if not (0 <= acc <= 1):
-#         raise ValueError("输入的 accuracy 值必须在 0 到 1 之间。")
-
-#     if acc <= 1e-6:
-#         return 32
-#     elif acc <= 1/8+1e-6:
-#         return 18
-#     elif acc <= 2/8+1e-6:
-#         return 11
-#     elif acc <= 3/8+1e-6:
-#         return 9
-#     else:
-#         return 8
-
-# def resample_func2(acc):
-#     if not (0 <= acc <= 1):
-#         raise ValueError("输入的 accuracy 值必须在 0 到 1 之间。")
-
-#     if acc <= 1e-6:
-#         return 48
-#     elif acc <= 1/8+1e-6:
-#         return 24
-#     elif acc <= 2/8+1e-6:
-#         return 12
-#     elif acc <= 3/8+1e-6:
-#         return 9
-#     else:
-#         return 8
 
 
 def select_resample_func(func_id):
