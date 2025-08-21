@@ -181,7 +181,7 @@ def reduce_metrics(metrics: dict):
 
 def schedule_ET(acc, N, N_max, std=False):
     if acc <= 1e-6:
-        return N_max 
+        return N_max - N 
     
     if acc >= 0.5:
         return 0
@@ -204,7 +204,7 @@ def schedule_ET(acc, N, N_max, std=False):
 
 def schedule_HW(acc, N, N_max, std=False):
     if acc <= 1e-6:
-        return N_max 
+        return N_max - N
     
     if acc >= 0.5:
         return 0
