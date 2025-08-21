@@ -1,9 +1,20 @@
+<!-- [![Paper](https://img.shields.io/badge/paper-A42C25?style=for-the-badge&logo=arxiv&logoColor=white)](https://arxiv.org/abs/2508.13755v1) [![alphaXiv](https://img.shields.io/badge/discussion-A42C25?style=for-the-badge&logo=arxiv&logoColor=white&color=blue
+)](https://www.alphaxiv.org/abs/2508.13755v1) [![Github](https://img.shields.io/badge/LUFFY-000000?style=for-the-badge&logo=github&logoColor=000&logoColor=white)](https://github.com/yangzhch6/DARS)   [![Hugging Face Collection](https://img.shields.io/badge/LUFFY_Collection-fcd022?style=for-the-badge&logo=huggingface&logoColor=000)](https://huggingface.co/collections/yangzhch6/dars-68a6c755262b9867f420c386)   [![Twitter](https://img.shields.io/badge/Twitter-%23000000.svg?style=for-the-badge&logo=twitter&logoColor=white)](https://x.com/yafuly/status/1914559433549676962) -->
+
+
 > The official implemention of [Depth-Breadth Synergy in RLVR: Unlocking LLM Reasoning Gains with Adaptive Exploration](https://arxiv.org/abs/2508.13755v1)
 
-## Prepare Data
-...
+# ✨Getting Started
 
-## Install
+## Prepare Data
+download [https://huggingface.co/datasets/yangzhch6/DARS-Data](https://huggingface.co/datasets/yangzhch6/DARS-Data)
+
+```
+openr1.parquet: training dats
+capacity_val.parquet: testing data
+```
+
+## Installation
 
 ```
 pip install -e ./verl
@@ -13,29 +24,34 @@ pip install flash-attn --no-build-isolation
 pip install -e .
 ```
 
-
 You may need to install flash-attention through:
 ```
 https://github.com/Dao-AILab/flash-attention/releases/tag/v2.7.4.post1
 ```
 
-## Run DARS-B
+
+# 🔧Usage
+
+## Training
+resampling_func 1: equal treatment schedule 
+resampling_func 2: hardness weighted schedule 
+
 ```
 #!/bin/bash
 set -x
 
 # Warning: Export VLLM_ATTENTION_BACKEND on every machine before starting Ray cluster.
 # vLLM without XFORMERS will results in CUDA errors.
-export WANDB_API_KEY="004ba186f7e1f9bd08fe620ddeaaf98ef356c95f"
+export WANDB_API_KEY="your key here"
 export VLLM_ATTENTION_BACKEND=XFORMERS
-export MODEL_PATH="$PATH/models/Qwen/Qwen2.5-Math-1.5B"
+export MODEL_PATH="$MODEL_PATH/Qwen2.5-Math-1.5B"
 export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 
 # Train over a single node, 1 A100-80GB GPUs.
 python3 -m verl.trainer.main_ppo_dars \
     algorithm.adv_estimator=grpo \
-    data.train_files=$PATH/RLVR-Data/nothink/openr1.parquet \
-    data.val_files=$PATH/RLVR-Data/nothink/capacity_train_and_val.parquet \
+    data.train_files=$DATA_PATH/openr1.parquet \
+    data.val_files=$DATA_PATH/capacity_val.parquet \
     data.train_batch_size=3072 \
     data.val_batch_size=512 \
     data.max_prompt_length=1024 \
@@ -84,5 +100,33 @@ python3 -m verl.trainer.main_ppo_dars \
 ```
 
 
-## Run grpo baseline
+## Baseline Training
 refer to [https://github.com/yangzhch6/rlvr-baseline](https://github.com/yangzhch6/rlvr-baseline)
+
+
+
+# 📃Evaluation
+```
+python /mnt/weka/home/yongxin.wang/workspace/lark/dars/analysis_results.py --data_path [your valid generation json path]
+```
+
+# 🌻Acknowledgement
+This repo builds upon [veRL](https://github.com/volcengine/verl) and [deepscaler](https://github.com/agentica-project/rllm), and utilizes [vLLM](https://github.com/vllm-project/vllm) for inference. We utilize [Math-Verify](https://github.com/huggingface/Math-Verify) for math reasoning evaluation. We thank the open-source community for datasets and backbones, [OpenR1-Math-220k](https://huggingface.co/datasets/open-r1/OpenR1-Math-220k), [Qwen2.5-Math](https://github.com/QwenLM/Qwen2.5-Math), and [DeepSeek-R1](https://github.com/deepseek-ai/deepseek-r1) model. 
+
+# 📬 Contact
+For questions, feedback, or collaboration opportunities, feel free to reach out:
+- Zhicheng Yang: yangzhch6@gmail.com
+
+# Citation
+If you find our model, or code useful, please kindly cite our paper:
+```bib
+@misc{yang2025depthbreadthsynergyrlvrunlocking,
+      title={Depth-Breadth Synergy in RLVR: Unlocking LLM Reasoning Gains with Adaptive Exploration}, 
+      author={Zhicheng Yang and Zhijiang Guo and Yinya Huang and Yongxin Wang and Dongchun Xie and Yiwei Wang and Xiaodan Liang and Jing Tang},
+      year={2025},
+      eprint={2508.13755},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2508.13755}, 
+}
+```
