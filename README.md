@@ -48,7 +48,7 @@ https://github.com/Dao-AILab/flash-attention/releases/tag/v2.7.4.post1
 
 # 🔧Usage
 
-## Training
+## DARS-B Training
 resampling_func 1: equal treatment schedule 
 resampling_func 2: hardness weighted schedule 
 
