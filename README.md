@@ -1,8 +1,24 @@
-<!-- [![Paper](https://img.shields.io/badge/paper-A42C25?style=for-the-badge&logo=arxiv&logoColor=white)](https://arxiv.org/abs/2508.13755v1) [![alphaXiv](https://img.shields.io/badge/discussion-A42C25?style=for-the-badge&logo=arxiv&logoColor=white&color=blue
-)](https://www.alphaxiv.org/abs/2508.13755v1) [![Github](https://img.shields.io/badge/LUFFY-000000?style=for-the-badge&logo=github&logoColor=000&logoColor=white)](https://github.com/yangzhch6/DARS)   [![Hugging Face Collection](https://img.shields.io/badge/LUFFY_Collection-fcd022?style=for-the-badge&logo=huggingface&logoColor=000)](https://huggingface.co/collections/yangzhch6/dars-68a6c755262b9867f420c386)   [![Twitter](https://img.shields.io/badge/Twitter-%23000000.svg?style=for-the-badge&logo=twitter&logoColor=white)](https://x.com/yafuly/status/1914559433549676962) -->
+<div align="center">
 
 
-> The official implemention of [Depth-Breadth Synergy in RLVR: Unlocking LLM Reasoning Gains with Adaptive Exploration](https://arxiv.org/abs/2508.13755v1)
+<h1 style="display: flex; justify-content: center; align-items: center; gap: 10px; margin: 0;">
+  Depth-Breadth Synergy in RLVR: Unlocking LLM Reasoning Gains with Adaptive Exploration
+</h1>
+<p align="center"><em>Difficulty adaptive rollout rebalancing with breadth-scaling to unlock simultaneous Pass@1 and Pass@K gains in RLVR.</em></p>
+<div align="center">
+  <img src="./figs/framework.png" alt="overview" style="width: 80%; height: auto;">
+</div>
+
+
+<div align="center">
+<a href="https://arxiv.org/abs/2508.13755v1"><img src="./figs/arxiv.png" width="10%"></a>
+<a href="(https://www.alphaxiv.org/abs/2508.13755v1"><img src="./figs/alphaxiv.png" width="10%"></a>
+<a href="https://github.com/yangzhch6/DARS"><img src="./figs/github.png" width="10%"></a>
+<a href="https://huggingface.co/collections/yangzhch6/dars-68a6c755262b9867f420c386"><img src="./figs/hf.png" width="10%"></a>
+</div>
+
+</div>
+
 
 # ✨Getting Started
 
