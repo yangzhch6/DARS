@@ -49,8 +49,8 @@ https://github.com/Dao-AILab/flash-attention/releases/tag/v2.7.4.post1
 # 🔧Usage
 
 ## DARS-B Training
-resampling_func 1: equal treatment schedule 
-resampling_func 2: hardness weighted schedule 
+resampling_func 1: equal treatment schedule, we set n_max = 32.
+resampling_func 2: hardness weighted schedule, we set n_max = 64. (TO DO)
 
 ```
 #!/bin/bash
@@ -63,6 +63,7 @@ export VLLM_ATTENTION_BACKEND=XFORMERS
 export MODEL_PATH="$MODEL_PATH/Qwen2.5-Math-1.5B"
 export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 
+# Train over a single node, 1 A100-80GB GPUs.
 # Train over a single node, 1 A100-80GB GPUs.
 python3 -m verl.trainer.main_ppo_dars \
     algorithm.adv_estimator=grpo \
@@ -100,8 +101,11 @@ python3 -m verl.trainer.main_ppo_dars \
     actor_rollout_ref.rollout.n_val=128 \
     actor_rollout_ref.ref.fsdp_config.param_offload=True \
     algorithm.kl_ctrl.kl_coef=0.000 \
+    +algorithm.n_max=32 \
     +algorithm.grpo_use_std=False \
     trainer.critic_warmup=0 \
+    +trainer.del_last_ckpt=False \
+    +trainer.log_train=True \
     trainer.logger=['console','wandb'] \
     trainer.project_name='DARS' \
     trainer.experiment_name='Qwen2.5-Math-1.5B-openr1-nothink-3k-func1-bs3k-pp2' \
@@ -111,7 +115,7 @@ python3 -m verl.trainer.main_ppo_dars \
     trainer.save_freq=14 \
     trainer.test_freq=14 \
     trainer.default_hdfs_dir=null \
-    trainer.total_training_steps=142 \
+    trainer.total_training_steps=86 \
     trainer.total_epochs=30 "${@:1}"
 ```
 
