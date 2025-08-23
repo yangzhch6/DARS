@@ -12,7 +12,7 @@
 
 <div align="center">
 <a href="https://arxiv.org/abs/2508.13755v1"><img src="./figs/arxiv.png" width="15%"></a>
-<a href="(https://www.alphaxiv.org/abs/2508.13755v1"><img src="./figs/alphaxiv.png" width="15%"></a>
+<a href="https://www.alphaxiv.org/abs/2508.13755v1"><img src="./figs/alphaxiv.png" width="15%"></a>
 <a href="https://github.com/yangzhch6/DARS"><img src="./figs/github.png" width="15%"></a>
 <a href="https://huggingface.co/collections/yangzhch6/dars-68a6c755262b9867f420c386"><img src="./figs/hf.png" width="15%"></a>
 </div>
@@ -50,6 +50,7 @@ https://github.com/Dao-AILab/flash-attention/releases/tag/v2.7.4.post1
 
 ## DARS-B Training
 resampling_func 1: equal treatment schedule, we set n_max = 32.
+
 resampling_func 2: hardness weighted schedule, we set n_max = 64. (TO DO)
 
 ```
@@ -63,8 +64,7 @@ export VLLM_ATTENTION_BACKEND=XFORMERS
 export MODEL_PATH="$MODEL_PATH/Qwen2.5-Math-1.5B"
 export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 
-# Train over a single node, 1 A100-80GB GPUs.
-# Train over a single node, 1 A100-80GB GPUs.
+# Train over a single node
 python3 -m verl.trainer.main_ppo_dars \
     algorithm.adv_estimator=grpo \
     data.train_files=$DATA_PATH/openr1.parquet \
@@ -138,7 +138,7 @@ For questions, feedback, or collaboration opportunities, feel free to reach out:
 - Zhicheng Yang: yangzhch6@gmail.com
 
 # Citation
-If you find our model, or code useful, please kindly cite our paper:
+If you find our model or code useful, please kindly cite our paper:
 ```bib
 @misc{yang2025depthbreadthsynergyrlvrunlocking,
       title={Depth-Breadth Synergy in RLVR: Unlocking LLM Reasoning Gains with Adaptive Exploration}, 
