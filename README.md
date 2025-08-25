@@ -26,7 +26,7 @@
 download [https://huggingface.co/datasets/yangzhch6/DARS-Data](https://huggingface.co/datasets/yangzhch6/DARS-Data)
 
 ```
-openr1.parquet: training dats
+openr1.parquet: training data
 capacity_val.parquet: testing data
 ```
 
