@@ -181,7 +181,8 @@ def reduce_metrics(metrics: dict):
 
 def schedule_ET(acc, N, N_max, std=False):
     if acc <= 1e-6:
-        return N_max - N 
+        # return N_max - N 
+        acc = 0.5 / N
     
     if acc >= 0.5:
         return 0
@@ -198,13 +199,14 @@ def schedule_ET(acc, N, N_max, std=False):
     delt_N = A_g_peak - A_g_current
     delt_N /= S_acc
 
-    delt_N = min(math.ceil(delt_N), N_max)
+    delt_N = min(math.ceil(delt_N), N_max - N)
 
     return delt_N
 
 def schedule_HW(acc, N, N_max, std=False):
     if acc <= 1e-6:
-        return N_max - N
+        # return N_max - N
+        acc = 0.5 / N
     
     if acc >= 0.5:
         return 0
@@ -221,7 +223,7 @@ def schedule_HW(acc, N, N_max, std=False):
     delt_N = 2 * (1 - acc) * A_g_peak - A_g_current
     delt_N /= S_acc
 
-    delt_N = min(math.ceil(delt_N), N_max)
+    delt_N = min(math.ceil(delt_N), N_max - N)
 
     return delt_N
 
@@ -1020,10 +1022,12 @@ class RayPPOTrainer(object):
                             # repeat the batch
                             second_batch += [original_input_batch[i]] * delt_n
 
+                    print("## re-balance generation batch size:", len(second_batch))
+                    metrics['2nd_rollout'] = len(second_batch)
+
                     ## aggregate the selected samples
                     second_batch = protocol.collate_fn(second_batch)
                     
-
                     second_batch.meta_info = {
                         'eos_token_id': self.tokenizer.eos_token_id,
                         'pad_token_id': self.tokenizer.pad_token_id,

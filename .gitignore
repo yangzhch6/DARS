@@ -182,6 +182,7 @@ cython_debug/
 data/* 
 
 tmp/
+tmp**
 
 # Ignore debug logs and run result logs
 logs/

@@ -103,15 +103,15 @@ if __name__ == "__main__":
     source_2_acc = compute_acc_source(initial_test)
     print(source_2_acc)
 
-    # macro_acc_list = []
-    # for source in source_2_acc:
-    #     if source == "train":
-    #         continue
-    #     macro_acc_list.append(source_2_acc[source])
+    macro_acc_list = []
+    for source in source_2_acc:
+        if source == "train":
+            continue
+        macro_acc_list.append(source_2_acc[source])
 
     
     print("## Micro Accuracy:", compute_acc_micro(initial_test))
-    # print("## Macro Accuracy:", sum(macro_acc_list) / len(macro_acc_list))
+    print("## Macro Accuracy:", sum(macro_acc_list) / len(macro_acc_list))
 
 
     # compute pass 16/32/48/64/80/96/112/128

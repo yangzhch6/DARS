@@ -713,6 +713,30 @@ class RayPPOTrainer(object):
             critic_local_path = os.path.join(local_global_step_folder, 'critic_huggingface')
             self.critic_wg.save_checkpoint_higgingface(critic_local_path)
 
+
+    def maybe_save_best_hf(self, val_metrics):
+        import json
+        actor_local_path = os.path.join(self.config.trainer.default_local_dir, 'best', f'actor')
+
+        os.makedirs(actor_local_path, exist_ok=True)
+        if os.path.exists(f'{actor_local_path}/metrics.json'):
+            with open(f'{actor_local_path}/metrics.json', 'r') as f:
+                metrics = json.load(f)
+            best_score = metrics['best_avg_score']
+        else:
+            print('Find no current best saved. Best score is set to -inf')
+            best_score = -float('inf')
+        
+        cur_score = val_metrics['avg_score']
+        
+        if cur_score > best_score:
+            print(f'Saving best checkpoint with score {cur_score} at {actor_local_path}')
+            best_score = cur_score
+            self.actor_rollout_wg.save_checkpoint_hf(actor_local_path)
+            with open(f'{actor_local_path}/metrics.json', 'w') as f:
+                f.write(json.dumps({'best_avg_score': best_score, 'global_step': self.global_steps})+'\n')
+
+
     def _save_checkpoint(self):
         self._save_checkpoint_huggingface()
         
@@ -750,9 +774,15 @@ class RayPPOTrainer(object):
         torch.cuda.empty_cache()
         # sleep(30)
 
-        ## delete last checkpoint actor
-        last_ckpt_path = os.path.join(self.config.trainer.default_local_dir,
-                                                f'global_step_{self.global_steps - self.config.trainer.save_freq}', 'actor')
+        ## delete last checkpoint
+        
+        if self.config.trainer.get('del_last_ckpt', False):
+            last_ckpt_path = os.path.join(self.config.trainer.default_local_dir,
+                            f'global_step_{self.global_steps - self.config.trainer.save_freq}')
+        else:
+            last_ckpt_path = os.path.join(self.config.trainer.default_local_dir,
+                            f'global_step_{self.global_steps - self.config.trainer.save_freq}',
+                            'actor')
         import shutil
         if os.path.exists(last_ckpt_path) and os.path.isdir(last_ckpt_path):
             shutil.rmtree(last_ckpt_path)
@@ -761,6 +791,7 @@ class RayPPOTrainer(object):
         # load from hdfs
         if self.config.trainer.default_hdfs_dir is not None:
             NotImplementedError('load from hdfs is not implemented yet')
+            return 0
         else:
             checkpoint_folder = self.config.trainer.default_local_dir  # TODO: check path
             if not os.path.isabs(checkpoint_folder):
@@ -793,10 +824,16 @@ class RayPPOTrainer(object):
         # load dataloader,
         # TODO: from remote not implemented yet
         dataloader_local_path = os.path.join(global_step_folder, 'data.pt')
-        self.train_dataloader = torch.load(dataloader_local_path)
-        from verl.utils.dataset.rl_dataset import RLHFDataset
-        if isinstance(self.train_dataloader.dataset, RLHFDataset):
-            self.train_dataloader.dataset.resume_dataset_state()
+        # if exist dataloader_local_path:
+        if os.path.exists(dataloader_local_path):
+            self.train_dataloader = torch.load(dataloader_local_path)
+            from verl.utils.dataset.rl_dataset import RLHFDataset
+            if isinstance(self.train_dataloader.dataset, RLHFDataset):
+                self.train_dataloader.dataset.resume_dataset_state()
+        else:
+            print("## Warning: training data ckpt path not exist!")
+        
+        return 1
 
     def _balance_batch(self, batch: DataProto, metrics, logging_prefix='global_seqlen'):
         """Reorder the data on single controller such that each dp rank gets similar total tokens"""
@@ -835,15 +872,15 @@ class RayPPOTrainer(object):
             self.global_steps = 0
 
         # load checkpoint before doing anything
-        self._load_checkpoint()
+        is_load_ckpt = self._load_checkpoint()
         # print(f'Loaded checkpoint from {self.config.trainer.default_local_dir}')
         print(f'Current global step: {self.global_steps}')
 
         # perform validation before training
         if self.val_reward_fn is not None and self.config.trainer.get('val_before_train', True):
             val_metrics = self._validate()
-            if 'avg_score' not in val_metrics:
-                val_metrics['avg_score'] = np.mean([val_metrics[key] for key in val_metrics if key.startswith('val/test_score/')])
+            # if 'avg_score' not in val_metrics:
+            #     val_metrics['avg_score'] = np.mean([val_metrics[key] for key in val_metrics if key.startswith('val/test_score/')])
             pprint(f'Initial validation metrics: {val_metrics}')
             logger.log(data=val_metrics, step=self.global_steps)
             if self.config.trainer.get('val_only', False):
@@ -852,9 +889,17 @@ class RayPPOTrainer(object):
         # we start from step 1
         self.global_steps += 1
 
+        if is_load_ckpt:
+            skip_load_steps = (self.global_steps-1) % len(self.train_dataloader)
+            print("## Skipping load steps:", skip_load_steps)
+
         for _ in range(self.config.trainer.total_epochs):
             
             for batch_dict in self.train_dataloader:
+                if is_load_ckpt and skip_load_steps > 0:
+                    skip_load_steps -= 1
+                    continue
+                    
                 batch: DataProto = DataProto.from_single_dict(batch_dict)
 
                 metrics = {}
@@ -962,7 +1007,6 @@ class RayPPOTrainer(object):
                         # compute advantages, executed on the driver process
                         batch = compute_advantage(batch,
                                                   adv_estimator=self.config.algorithm.adv_estimator,
-                                                  clip_value=self.config.algorithm.clip_adv_value,
                                                   gamma=self.config.algorithm.gamma,
                                                   lam=self.config.algorithm.lam,
                                                   grpo_use_std=self.config.algorithm.grpo_use_std)
@@ -995,16 +1039,18 @@ class RayPPOTrainer(object):
                         self.global_steps % self.config.trainer.test_freq == 0:
                         with _timer('testing', timing_raw):
                             val_metrics: dict = self._validate()
-                        if 'avg_score' not in val_metrics:
-                            val_metrics['avg_score'] = np.mean([val_metrics[key] for key in val_metrics if key.startswith('val/test_score/')])
+                        # if 'avg_score' not in val_metrics:
+                        #     val_metrics['avg_score'] = np.mean([val_metrics[key] for key in val_metrics if key.startswith('val/test_score/')])
                         metrics.update(val_metrics)
+                        # self.maybe_save_best_hf(val_metrics)
 
                     if self.config.trainer.save_freq > 0 and \
                             self.global_steps % self.config.trainer.save_freq == 0:
                         with _timer('save_checkpoint', timing_raw):
                             self._save_checkpoint()
 
-                self.log_train_generations(batch=batch)
+                if self.config.trainer.get('log_train', False):
+                    self.log_train_generations(batch=batch)
 
                 # collect metrics
                 metrics.update(compute_data_metrics(batch=batch, use_critic=self.use_critic))
@@ -1017,9 +1063,9 @@ class RayPPOTrainer(object):
 
                 if self.global_steps >= self.total_training_steps:
 
-                    # perform validation after training
-                    if self.val_reward_fn is not None:
-                        val_metrics = self._validate()
-                        pprint(f'Final validation metrics: {val_metrics}')
-                        logger.log(data=val_metrics, step=self.global_steps)
+                    # # perform validation after training
+                    # if self.val_reward_fn is not None:
+                    #     val_metrics = self._validate()
+                    #     pprint(f'Final validation metrics: {val_metrics}')
+                    #     logger.log(data=val_metrics, step=self.global_steps)
                     return
