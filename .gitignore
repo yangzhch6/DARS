@@ -187,3 +187,5 @@ tmp/
 logs/
 
 slurm
+
+scripts
