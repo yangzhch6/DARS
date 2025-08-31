@@ -32,6 +32,23 @@ capacity_val.parquet: testing data
 
 ## Installation
 
+### Choice 1: Install from conda pack (Recommended)
+download [https://huggingface.co/yangzhch6/dars-env](https://huggingface.co/yangzhch6/dars-env)
+
+then,
+```
+mkdir -p /opt/envs/dars
+tar xzf dars.tar.gz -C /opt/envs/dars
+
+source /opt/envs/dars/bin/activate
+# or
+conda activate /opt/envs/dars
+```
+> This choice only works for *CUDA-12.4*
+
+
+
+### Choice 2: Install from scratch
 ```
 pip install -e ./verl
 pip install packaging
@@ -49,9 +66,11 @@ https://github.com/Dao-AILab/flash-attention/releases/tag/v2.7.4.post1
 # 🔧Usage
 
 ## DARS-B Training
-resampling_func 1: equal treatment schedule, we set n_max = 32.
+> More experiment scripts refer to ./experiments/**.sh
 
-resampling_func 2: hardness weighted schedule, we set n_max = 64. (TO DO)
+**resampling_func 1**: equal treatment schedule, we set n_max = 32 for training DARS-1.5B/7B.
+
+**resampling_func 2**: hardness weighted schedule, we set n_max = 64 for training DARS-1.5B/7B. 
 
 ```
 #!/bin/bash
@@ -119,10 +138,28 @@ python3 -m verl.trainer.main_ppo_dars \
     trainer.total_epochs=30 "${@:1}"
 ```
 
-
 ## Baseline Training
-refer to [https://github.com/yangzhch6/rlvr-baseline](https://github.com/yangzhch6/rlvr-baseline)
+refer to [dars-baseline branch](https://github.com/yangzhch6/DARS/tree/dars-baseline)
 
+
+<!-- # Experimental Results
+
+| **Model**                          | **AIME 2024** | **AMC** | **MATH-500** | **Minerva** | **Olympiad** | ***Avg@128*** | ***Pass@128*** |
+|-----------------------------------|-------------|-------------|---------|---------------|-------------|---------------|----------|
+| | | | | | | | | -->
+
+
+# DARS Models
+| **Model**                          | **Huggingface** |  **Base Model** |
+|-----------------------------------|------------------|------------------|
+| DARS-1.5B-ET | https://huggingface.co/yangzhch6/DARS-1.5B-ET |  Qwen2.5-Math-1.5B |
+| DARS-1.5B-HW | https://huggingface.co/yangzhch6/DARS-1.5B-HW |  Qwen2.5-Math-1.5B |
+| DARS-1.5B-ET-Breadth | https://huggingface.co/yangzhch6/DARS-1.5B-ET-Breadth |  Qwen2.5-Math-1.5B |
+| DARS-1.5B-HW-Breadth | https://huggingface.co/yangzhch6/DARS-1.5B-HW-Breadth |  Qwen2.5-Math-1.5B |
+| DARS-7B-ET | https://huggingface.co/yangzhch6/DARS-7B-ET |  Qwen2.5-Math-7B |
+| DARS-7B-HW | https://huggingface.co/yangzhch6/DARS-7B-HW |  Qwen2.5-Math-7B |
+| DARS-7B-ET-Breadth | https://huggingface.co/yangzhch6/DARS-7B-ET-Breadth |  Qwen2.5-Math-7B |
+| DARS-7B-HW-Breadth | https://huggingface.co/yangzhch6/DARS-7B-HW-Breadth |  Qwen2.5-Math-7B |
 
 
 # 📃Evaluation
