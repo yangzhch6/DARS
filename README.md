@@ -43,6 +43,10 @@ tar xzf dars.tar.gz -C /opt/envs/dars
 source /opt/envs/dars/bin/activate
 # or
 conda activate /opt/envs/dars
+
+cd dars
+pip install -e ./verl
+pip install -e .
 ```
 > This choice only works for *CUDA-12.4*
 
@@ -142,11 +146,24 @@ python3 -m verl.trainer.main_ppo_dars \
 refer to [dars-baseline branch](https://github.com/yangzhch6/DARS/tree/dars-baseline)
 
 
-<!-- # Experimental Results
+# Experimental Results
 
-| **Model**                          | **AIME 2024** | **AMC** | **MATH-500** | **Minerva** | **Olympiad** | ***Avg@128*** | ***Pass@128*** |
+| **Model**                          | **AIME24** | **MATH-500** | **Olympiad** | **AMC** | **Minerva** | ***Avg@128*** | ***Pass@128*** |
 |-----------------------------------|-------------|-------------|---------|---------------|-------------|---------------|----------|
-| | | | | | | | | -->
+| |
+| Qwen-Math-1.5B-Base | 4.0 | 35.1 | 16.2 | 20.8 | 9.5 | 21.1 | 77.9 |
+| Qwen-Math-1.5B-RLVR | 14.7 | 75.9 | 39.4 | 47.5 | 31.2 | 49.6 | 79.6 |
+| DARS-1.5B-ET | 15.8 | 76.0 | 40.9 | 47.2 | 30.0 | 50.0 | 81.2 |
+| DARS-1.5B-ET-Breadth | 18.6 | 79.4 | 42.9 | 50.6 | 31.7 | 52.5 | 80.8 |
+| DARS-1.5B-HW | 14.7 | 76.4 | 40.0 | 48.4 | 30.8 | 50.0 | 82.1 |
+| DARS-1.5B-HW-Breadth | | | | | | | |
+| |
+| Qwen-Math-7B-Base | 11.6 | 52.3 | 19.7 | 35.2 | 15.3 | 30.1 | 82.1 |
+| Qwen-Math-7B-RLVR | 26.8 | 82.2 | 44.3 | 57.2 | 35.7 | 55.3 | 81.4 |
+| DARS-7B-ET | 26.9 | 83.2 | 46.6 | 57.3 | 38.5 | 57.0 | 81.7 |
+| DARS-7B-ET-Breadth | 33.3 | 83.8 | 47.8 | 61.3 | 38.4 | 58.1 | 82.1 |
+| DARS-7B-HW | 30.1 | 83.5 | 47.1 | 59.4 | 37.2 | 57.3 | 83.5 |
+| DARS-7B-HW-Breadth | | | | | | | |
 
 
 # DARS Models
