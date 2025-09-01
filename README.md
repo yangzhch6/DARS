@@ -23,7 +23,7 @@
 # ✨Getting Started
 
 ## Prepare Data
-download [https://huggingface.co/datasets/yangzhch6/DARS-Data](https://huggingface.co/datasets/yangzhch6/DARS-Data)
+download [https://huggingface.co/datasets/yangzhch6/DARS-Dataset](https://huggingface.co/datasets/yangzhch6/DARS-Dataset)
 
 ```
 openr1.parquet: training data
