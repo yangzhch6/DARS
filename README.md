@@ -145,6 +145,11 @@ python3 -m verl.trainer.main_ppo_dars \
 ## Baseline Training
 refer to [dars-baseline branch](https://github.com/yangzhch6/DARS/tree/dars-baseline)
 
+# 📃EvaluationET
+```
+python /mnt/weka/home/yongxin.wang/workspace/lark/dars/analysis_results.py --data_path [your valid generation json path]
+```
+
 
 # Experimental Results
 
@@ -184,10 +189,6 @@ refer to [dars-baseline branch](https://github.com/yangzhch6/DARS/tree/dars-base
 | |
 | DARS-Llama-ET-Breadth | https://huggingface.co/yangzhch6/DARS-Llama-ET-Breadth | Llama-3.1-8B |
 
-# 📃EvaluationET
-```
-python /mnt/weka/home/yongxin.wang/workspace/lark/dars/analysis_results.py --data_path [your valid generation json path]
-```
 
 # 🌻Acknowledgement
 This repo builds upon [veRL](https://github.com/volcengine/verl) and [deepscaler](https://github.com/agentica-project/rllm), and utilizes [vLLM](https://github.com/vllm-project/vllm) for inference. We utilize [Math-Verify](https://github.com/huggingface/Math-Verify) for math reasoning evaluation. We thank the open-source community for datasets and backbones, [OpenR1-Math-220k](https://huggingface.co/datasets/open-r1/OpenR1-Math-220k), [Qwen2.5-Math](https://github.com/QwenLM/Qwen2.5-Math), and [DeepSeek-R1](https://github.com/deepseek-ai/deepseek-r1) model. 
