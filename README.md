@@ -164,22 +164,27 @@ refer to [dars-baseline branch](https://github.com/yangzhch6/DARS/tree/dars-base
 | DARS-7B-ET-Breadth | 33.3 | 83.8 | 47.8 | 61.3 | 38.4 | 58.1 | 82.1 |
 | DARS-7B-HW | 30.1 | 83.5 | 47.1 | 59.4 | 37.2 | 57.3 | 83.5 |
 | DARS-7B-HW-Breadth | 33.0 | 84.5 | 48.4 | 63.0 | 36.9 | 58.4 | 83.4 |
-
+| |
+| Llama-3.1-8B-Base | 0.23 | 6.13 | 1.54 | 2.76 | 2.72 | 3.25 | 52.7 |
+| DARS-Llama-ET-Breadth | 1.46 | 39.4 | 12.0 | 13.2 | 20.1 | 22.0 | 67.2 |
 
 # DARS Models
 | **Model**                          | **Huggingface** |  **Base Model** |
 |-----------------------------------|------------------|------------------|
-| DARS-1.5B-ET | https://huggingface.co/yangzhch6/DARS-1.5B-ET |  Qwen2.5-Math-1.5B |
-| DARS-1.5B-HW | https://huggingface.co/yangzhch6/DARS-1.5B-HW |  Qwen2.5-Math-1.5B |
-| DARS-1.5B-ET-Breadth | https://huggingface.co/yangzhch6/DARS-1.5B-ET-Breadth |  Qwen2.5-Math-1.5B |
-| DARS-1.5B-HW-Breadth | https://huggingface.co/yangzhch6/DARS-1.5B-HW-Breadth |  Qwen2.5-Math-1.5B |
-| DARS-7B-ET | https://huggingface.co/yangzhch6/DARS-7B-ET |  Qwen2.5-Math-7B |
-| DARS-7B-HW | https://huggingface.co/yangzhch6/DARS-7B-HW |  Qwen2.5-Math-7B |
-| DARS-7B-ET-Breadth | https://huggingface.co/yangzhch6/DARS-7B-ET-Breadth |  Qwen2.5-Math-7B |
-| DARS-7B-HW-Breadth | https://huggingface.co/yangzhch6/DARS-7B-HW-Breadth |  Qwen2.5-Math-7B |
+| |
+| DARS-1.5B-ET | https://huggingface.co/yangzhch6/DARS-1.5B-ET | Qwen2.5-Math-1.5B |
+| DARS-1.5B-HW | https://huggingface.co/yangzhch6/DARS-1.5B-HW | Qwen2.5-Math-1.5B |
+| DARS-1.5B-ET-Breadth | https://huggingface.co/yangzhch6/DARS-1.5B-ET-Breadth | Qwen2.5-Math-1.5B |
+| DARS-1.5B-HW-Breadth | https://huggingface.co/yangzhch6/DARS-1.5B-HW-Breadth | Qwen2.5-Math-1.5B |
+| |
+| DARS-7B-ET | https://huggingface.co/yangzhch6/DARS-7B-ET | Qwen2.5-Math-7B |
+| DARS-7B-HW | https://huggingface.co/yangzhch6/DARS-7B-HW | Qwen2.5-Math-7B |
+| DARS-7B-ET-Breadth | https://huggingface.co/yangzhch6/DARS-7B-ET-Breadth | Qwen2.5-Math-7B |
+| DARS-7B-HW-Breadth | https://huggingface.co/yangzhch6/DARS-7B-HW-Breadth | Qwen2.5-Math-7B |
+| |
+| DARS-Llama-ET-Breadth | https://huggingface.co/yangzhch6/DARS-Llama-ET-Breadth | Llama-3.1-8B |
 
-
-# 📃Evaluation
+# 📃EvaluationET
 ```
 python /mnt/weka/home/yongxin.wang/workspace/lark/dars/analysis_results.py --data_path [your valid generation json path]
 ```
