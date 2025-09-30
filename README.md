@@ -147,11 +147,15 @@ refer to [dars-baseline branch](https://github.com/yangzhch6/DARS/tree/dars-base
 
 # 📃EvaluationET
 ```
-python /mnt/weka/home/yongxin.wang/workspace/lark/dars/analysis_results.py --data_path [your valid generation json path]
+python ./analysis_results.py --data_path [your valid generation json path]
 ```
 
-
 # Experimental Results
+
+<div align="center">
+  <img src="./figs/exp.png" alt="overview" style="width: 80%; height: auto;">
+</div>
+
 
 | **Model**                          | **AIME24** | **MATH-500** | **Olympiad** | **AMC** | **Minerva** | ***Avg@128*** | ***Pass@128*** |
 |-----------------------------------|-------------|-------------|---------|---------------|-------------|---------------|----------|
@@ -172,6 +176,7 @@ python /mnt/weka/home/yongxin.wang/workspace/lark/dars/analysis_results.py --dat
 | |
 | Llama-3.1-8B-Base | 0.23 | 6.13 | 1.54 | 2.76 | 2.72 | 3.25 | 52.7 |
 | DARS-Llama-ET-Breadth | 1.46 | 39.4 | 12.0 | 13.2 | 20.1 | 22.0 | 67.2 |
+| DARS-Llama-HW-Breadth | 1.11 | 39.0 | 12.0 | 13.3 | 19.8 | 21.8 | 68.7 |
 
 # DARS Models
 | **Model**                          | **Huggingface** |  **Base Model** |
@@ -188,7 +193,7 @@ python /mnt/weka/home/yongxin.wang/workspace/lark/dars/analysis_results.py --dat
 | DARS-7B-HW-Breadth | https://huggingface.co/yangzhch6/DARS-7B-HW-Breadth | Qwen2.5-Math-7B |
 | |
 | DARS-Llama-ET-Breadth | https://huggingface.co/yangzhch6/DARS-Llama-ET-Breadth | Llama-3.1-8B |
-
+| DARS-Llama-HW-Breadth | https://huggingface.co/yangzhch6/DARS-Llama-HW-Breadth | Llama-3.1-8B |
 
 # 🌻Acknowledgement
 This repo builds upon [veRL](https://github.com/volcengine/verl) and [deepscaler](https://github.com/agentica-project/rllm), and utilizes [vLLM](https://github.com/vllm-project/vllm) for inference. We utilize [Math-Verify](https://github.com/huggingface/Math-Verify) for math reasoning evaluation. We thank the open-source community for datasets and backbones, [OpenR1-Math-220k](https://huggingface.co/datasets/open-r1/OpenR1-Math-220k), [Qwen2.5-Math](https://github.com/QwenLM/Qwen2.5-Math), and [DeepSeek-R1](https://github.com/deepseek-ai/deepseek-r1) model. 
