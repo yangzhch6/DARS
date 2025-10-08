@@ -160,40 +160,45 @@ python ./analysis_results.py --data_path [your valid generation json path]
 | **Model**                          | **AIME24** | **MATH-500** | **Olympiad** | **AMC** | **Minerva** | ***Avg@128*** | ***Pass@128*** |
 |-----------------------------------|-------------|-------------|---------|---------------|-------------|---------------|----------|
 | |
-| <code>Qwen-Math-1.5B-Base</code> | 4.0 | 35.1 | 16.2 | 20.8 | 9.5 | 21.1 | 77.9 |
-| Qwen-Math-1.5B-RLVR | 14.7 | 75.9 | 39.4 | 47.5 | 31.2 | 49.6 | 79.6 |
-| DARS-1.5B-ET | 15.8 | 76.0 | 40.9 | 47.2 | 30.0 | 50.0 | 81.2 |
-| DARS-1.5B-ET-Breadth | 18.6 | 79.4 | 42.9 | 50.6 | 31.7 | 52.5 | 80.8 |
-| DARS-1.5B-HW | 14.7 | 76.4 | 40.0 | 48.4 | 30.8 | 50.0 | 82.1 |
-| DARS-1.5B-HW-Breadth | 19.3 | 79.0 | 42.7 | 51.9 | 31.6 | 52.4 | 82.2 |
+| <code>*Qwen-Math-1.5B-Base*</code> | 4.0 | 35.1 | 16.2 | 20.8 | 9.5 | 21.1 | 77.9 |
+| <code>*Qwen-Math-1.5B-Ins*</code> | 10.2 | 67.9 | 34.7 | 42.6 | 24.4 | 43.5 | 79.9 |
+| <code>*Oat-Zero-1.5B*</code> | 16.4 | 73.0 | 35.5 | 47.4 | 26.8 | 46.3 | 80.3 |
+| <code>Qwen-Math-1.5B-RLVR</code> | 14.7 | 75.9 | 39.4 | 47.5 | 31.2 | 49.6 | 79.6 |
+| <code>DARS-1.5B-ET</code> | 15.8 | 76.0 | 40.9 | 47.2 | 30.0 | 50.0 | 81.2 |
+| <code>DARS-1.5B-ET-Breadth</code> | 18.6 | 79.4 | 42.9 | 50.6 | 31.7 | 52.5 | 80.8 |
+| <code>DARS-1.5B-HW</code> | 14.7 | 76.4 | 40.0 | 48.4 | 30.8 | 50.0 | 82.1 |
+| <code>DARS-1.5B-HW-Breadth</code> | 19.3 | 79.0 | 42.7 | 51.9 | 31.6 | 52.4 | 82.2 |
 | |
-| Qwen-Math-7B-Base | 11.6 | 52.3 | 19.7 | 35.2 | 15.3 | 30.1 | 82.1 |
-| Qwen-Math-7B-RLVR | 26.8 | 82.2 | 44.3 | 57.2 | 35.7 | 55.3 | 81.4 |
-| DARS-7B-ET | 26.9 | 83.2 | 46.6 | 57.3 | 38.5 | 57.0 | 81.7 |
-| DARS-7B-ET-Breadth | 33.3 | 83.8 | 47.8 | 61.3 | 38.4 | 58.1 | 82.1 |
-| DARS-7B-HW | 30.1 | 83.5 | 47.1 | 59.4 | 37.2 | 57.3 | 83.5 |
-| DARS-7B-HW-Breadth | 33.0 | 84.5 | 48.4 | 63.0 | 36.9 | 58.4 | 83.4 |
+| <code>*Qwen-Math-7B-Base*</code> | 11.6 | 52.3 | 19.7 | 35.2 | 15.3 | 30.1 | 82.1 |
+| <code>*Qwen2.5-Math-7B-Ins*</code> | 12.9 | 81.5 | 39.9 | 47.0 | 34.1 | 52.0 | 82.3 |
+| <code>*SimpleRL-Zero-7B*</code> | 23.3 | 72.8 | 36.1 | 52.8 | 26.8 | 46.9 | 82.5 |
+| <code>*Oat-Zero-7B*</code> | 31.3 | 79.2 | 42.5 | 59.4 | 33.7 | 53.4 | 79.7 |
+| <code>Qwen-Math-7B-RLVR</code> | 26.8 | 82.2 | 44.3 | 57.2 | 35.7 | 55.3 | 81.4 |
+| <code>DARS-7B-ET</code> | 26.9 | 83.2 | 46.6 | 57.3 | 38.5 | 57.0 | 81.7 |
+| <code>DARS-7B-ET-Breadth</code> | 33.3 | 83.8 | 47.8 | 61.3 | 38.4 | 58.1 | 82.1 |
+| <code>DARS-7B-HW</code> | 30.1 | 83.5 | 47.1 | 59.4 | 37.2 | 57.3 | 83.5 |
+| <code>DARS-7B-HW-Breadth</code> | 33.0 | 84.5 | 48.4 | 63.0 | 36.9 | 58.4 | 83.4 |
 | |
-| Llama-3.1-8B-Base | 0.23 | 6.13 | 1.54 | 2.76 | 2.72 | 3.25 | 52.7 |
-| DARS-Llama-ET-Breadth | 1.46 | 39.4 | 12.0 | 13.2 | 20.1 | 22.0 | 67.2 |
-| DARS-Llama-HW-Breadth | 1.11 | 39.0 | 12.0 | 13.3 | 19.8 | 21.8 | 68.7 |
+| <code>*Llama-3.1-8B-Base*</code> | 0.23 | 6.13 | 1.54 | 2.76 | 2.72 | 3.25 | 52.7 |
+| <code>DARS-Llama-ET-Breadth</code> | 1.46 | 39.4 | 12.0 | 13.2 | 20.1 | 22.0 | 67.2 |
+| <code>DARS-Llama-HW-Breadth</code> | 1.11 | 39.0 | 12.0 | 13.3 | 19.8 | 21.8 | 68.7 |
 
 # DARS Models
 | **Model**                          | **Huggingface** |  **Base Model** |
 |-----------------------------------|------------------|------------------|
 | |
-| DARS-1.5B-ET | https://huggingface.co/yangzhch6/DARS-1.5B-ET | Qwen2.5-Math-1.5B |
-| DARS-1.5B-HW | https://huggingface.co/yangzhch6/DARS-1.5B-HW | Qwen2.5-Math-1.5B |
-| DARS-1.5B-ET-Breadth | https://huggingface.co/yangzhch6/DARS-1.5B-ET-Breadth | Qwen2.5-Math-1.5B |
-| DARS-1.5B-HW-Breadth | https://huggingface.co/yangzhch6/DARS-1.5B-HW-Breadth | Qwen2.5-Math-1.5B |
+| <code>DARS-1.5B-ET</code> | https://huggingface.co/yangzhch6/DARS-1.5B-ET | Qwen2.5-Math-1.5B |
+| <code>DARS-1.5B-HW</code> | https://huggingface.co/yangzhch6/DARS-1.5B-HW | Qwen2.5-Math-1.5B |
+| <code>DARS-1.5B-ET-Breadth</code> | https://huggingface.co/yangzhch6/DARS-1.5B-ET-Breadth | Qwen2.5-Math-1.5B |
+| <code>DARS-1.5B-HW-Breadth</code> | https://huggingface.co/yangzhch6/DARS-1.5B-HW-Breadth | Qwen2.5-Math-1.5B |
 | |
-| DARS-7B-ET | https://huggingface.co/yangzhch6/DARS-7B-ET | Qwen2.5-Math-7B |
-| DARS-7B-HW | https://huggingface.co/yangzhch6/DARS-7B-HW | Qwen2.5-Math-7B |
-| DARS-7B-ET-Breadth | https://huggingface.co/yangzhch6/DARS-7B-ET-Breadth | Qwen2.5-Math-7B |
-| DARS-7B-HW-Breadth | https://huggingface.co/yangzhch6/DARS-7B-HW-Breadth | Qwen2.5-Math-7B |
+| <code>DARS-7B-ET</code> | https://huggingface.co/yangzhch6/DARS-7B-ET | Qwen2.5-Math-7B |
+| <code>DARS-7B-HW</code> | https://huggingface.co/yangzhch6/DARS-7B-HW | Qwen2.5-Math-7B |
+| <code>DARS-7B-ET-Breadth</code> | https://huggingface.co/yangzhch6/DARS-7B-ET-Breadth | Qwen2.5-Math-7B |
+| <code>DARS-7B-HW-Breadth</code> | https://huggingface.co/yangzhch6/DARS-7B-HW-Breadth | Qwen2.5-Math-7B |
 | |
-| DARS-Llama-ET-Breadth | https://huggingface.co/yangzhch6/DARS-Llama-ET-Breadth | Llama-3.1-8B |
-| DARS-Llama-HW-Breadth | https://huggingface.co/yangzhch6/DARS-Llama-HW-Breadth | Llama-3.1-8B |
+| <code>DARS-Llama-ET-Breadth</code> | https://huggingface.co/yangzhch6/DARS-Llama-ET-Breadth | Llama-3.1-8B |
+| <code>DARS-Llama-HW-Breadth</code> | https://huggingface.co/yangzhch6/DARS-Llama-HW-Breadth | Llama-3.1-8B |
 
 # 🌻Acknowledgement
 This repo builds upon [veRL](https://github.com/volcengine/verl) and [deepscaler](https://github.com/agentica-project/rllm), and utilizes [vLLM](https://github.com/vllm-project/vllm) for inference. We utilize [Math-Verify](https://github.com/huggingface/Math-Verify) for math reasoning evaluation. We thank the open-source community for datasets and backbones, [OpenR1-Math-220k](https://huggingface.co/datasets/open-r1/OpenR1-Math-220k), [Qwen2.5-Math](https://github.com/QwenLM/Qwen2.5-Math), and [DeepSeek-R1](https://github.com/deepseek-ai/deepseek-r1) model. 
