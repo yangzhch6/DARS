@@ -11,8 +11,8 @@
 
 
 <div align="center">
-<a href="https://arxiv.org/abs/2508.13755v1"><img src="./figs/arxiv.png" width="15%"></a>
-<a href="https://www.alphaxiv.org/abs/2508.13755v1"><img src="./figs/alphaxiv.png" width="15%"></a>
+<a href="https://arxiv.org/abs/2508.13755"><img src="./figs/arxiv.png" width="15%"></a>
+<a href="https://www.alphaxiv.org/abs/2508.13755"><img src="./figs/alphaxiv.png" width="15%"></a>
 <a href="https://github.com/yangzhch6/DARS"><img src="./figs/github.png" width="15%"></a>
 <a href="https://huggingface.co/collections/yangzhch6/dars-68a6c755262b9867f420c386"><img src="./figs/hf.png" width="15%"></a>
 </div>
