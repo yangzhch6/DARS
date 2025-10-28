@@ -4,7 +4,11 @@
 <h1 style="display: flex; justify-content: center; align-items: center; gap: 10px; margin: 0;">
   Depth-Breadth Synergy in RLVR: Unlocking LLM Reasoning Gains with Adaptive Exploration
 </h1>
-<p align="center"><em>Difficulty adaptive rollout rebalancing with breadth-scaling to unlock simultaneous Pass@1 and Pass@K gains in RLVR.</em></p>
+<p align="center">
+  <em>Difficulty Adaptive Rollout Sampling (DARS) with Breadth-Scaling to unlock simultaneous Pass@1 and Pass@K gains in RLVR.</em>
+  
+  <em>**We treat DARS as the focal loss in RLVR.**</em>
+</p>
 <div align="center">
   <img src="./figs/framework.png" alt="overview" style="width: 80%; height: auto;">
 </div>
