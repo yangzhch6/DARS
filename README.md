@@ -69,7 +69,7 @@ https://github.com/Dao-AILab/flash-attention/releases/tag/v2.7.4.post1
 
 # 🔧Usage
 
-## DARS-B Training
+## DARS-Breadth Training
 > More experiment scripts refer to ./experiments/**.sh
 
 **resampling_func 1**: equal treatment schedule, we set n_max = 32 for training DARS-1.5B/7B.
