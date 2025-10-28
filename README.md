@@ -5,7 +5,7 @@
   Depth-Breadth Synergy in RLVR: Unlocking LLM Reasoning Gains with Adaptive Exploration
 </h1>
 <p align="center">
-  <em>Difficulty Adaptive Rollout Sampling (DARS) with Breadth-Scaling to unlock simultaneous Pass@1 and Pass@K gains in RLVR.</em>
+  <em>Difficulty Adaptive Rollout Sampling (DARS) with Breadth-Scaling to unlock simultaneous Pass@1-K gains in RLVR.</em>
   
   <em>**We treat DARS as the focal loss in RLVR.**</em>
 </p>
