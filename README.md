@@ -170,7 +170,7 @@ python ./analysis_results.py --data_path [your valid generation json path]
 | <code>Qwen-Math-1.5B-RLVR</code> | 14.7 | 75.9 | 39.4 | 47.5 | 31.2 | 49.6 | 79.6 |
 | <code>DARS-1.5B-ET</code> | 15.8 | 76.0 | 40.9 | 47.2 | 30.0 | 50.0 | 81.2 |
 | <code>DARS-1.5B-ET-Breadth</code> | 18.6 | 79.4 | 42.9 | 50.6 | 31.7 | 52.5 | 80.8 |
-| <code>DARS-1.5B-HW</code> | 14.7 | 76.4 | 40.0 | 48.4 | 30.8 | 50.0 | 82.1 |
+| <code>DARS-1.5B-HW</code> | 16.4 | 76.4 | 40.0 | 48.4 | 30.8 | 50.0 | 82.1 |
 | <code>DARS-1.5B-HW-Breadth</code> | 19.3 | 79.0 | 42.7 | 51.9 | 31.6 | 52.4 | 82.2 |
 | |
 | <code>*Qwen-Math-7B-Base*</code> | 11.6 | 52.3 | 19.7 | 35.2 | 15.3 | 30.1 | 82.1 |
