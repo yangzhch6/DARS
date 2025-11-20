@@ -148,6 +148,8 @@ python3 -m verl.trainer.main_ppo_dars \
 
 ## Baseline Training
 refer to [dars-baseline branch](https://github.com/yangzhch6/DARS/tree/dars-baseline)
+This is to acquire our own RLVR baseline replication results.
+
 
 # 📃EvaluationET
 ```
